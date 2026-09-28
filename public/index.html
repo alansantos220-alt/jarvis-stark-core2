@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. // Stark Core OS v5.0</title>
+    <title>J.A.R.V.I.S. // Stark Core OS v5.2</title>
     <style>
         :root {
             --bg-color: #030712;
@@ -118,54 +118,85 @@
             font-size: 0.85rem;
             color: var(--neon-cyan);
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             border-bottom: 1px dashed var(--border-color);
             padding-bottom: 6px;
         }
 
-        /* PAINEL DE VÍDEO / HOLOGRAFIA DINÂMICA */
-        .holo-projector-container {
+        /* TELA DE VÍDEO DE DANÇA (ESQUERDA) */
+        .video-display-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             position: relative;
             background: #000;
-            border-radius: 8px;
-            margin: 5px 0;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            min-height: 240px;
+            min-height: 200px;
+            margin-bottom: 8px;
         }
 
-        .holo-projector-container iframe {
+        .video-display-container iframe {
             width: 100%;
             height: 100%;
             border: none;
-            pointer-events: auto;
         }
 
-        .holo-controls {
+        .control-group {
             display: flex;
-            gap: 5px;
-            margin-top: 8px;
-            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
-        .holo-controls button {
+        label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .url-input-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .url-input-row input {
+            flex: 1;
+            background: rgba(0,10,20,0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            outline: none;
+        }
+
+        .url-input-row button {
+            padding: 0 10px;
+            font-size: 0.75rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-row button {
+            flex: 1;
             font-size: 0.65rem;
-            padding: 5px 10px;
+            padding: 5px 0;
         }
 
         .jarvis-status-text {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: var(--neon-cyan);
-            margin-top: 6px;
             text-align: center;
+            margin-top: 4px;
             text-shadow: 0 0 5px var(--neon-cyan);
         }
 
-        /* CHAT INTERATIVO */
+        /* CHAT INTERATIVO (CENTRO) */
         .chat-box {
             flex: 1;
             overflow-y: auto;
@@ -236,38 +267,16 @@
             box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        .mic-btn.listening {
-            background: #ff3333 !important;
-            border-color: #ff6666 !important;
-            color: #fff !important;
-            box-shadow: 0 0 12px #ff3333;
-        }
-
-        /* MEDIA & PLAYER */
+        /* PLAYER DE MÍDIA (DIREITA) */
         .media-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-        }
-
-        label {
-            font-size: 0.72rem;
-            color: var(--text-dim);
-        }
-
-        select, .custom-input {
-            background: rgba(0,10,20,0.85);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 7px;
-            border-radius: 4px;
-            font-size: 0.78rem;
-            outline: none;
+            gap: 8px;
         }
 
         .player-screen {
             width: 100%;
-            height: 150px;
+            height: 140px;
             background: #000;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -292,7 +301,7 @@
 
         .player-controls button {
             flex: 1;
-            padding: 7px 0;
+            padding: 6px 0;
             font-size: 0.72rem;
         }
 
@@ -302,6 +311,16 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        select {
+            background: rgba(0,10,20,0.85);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            outline: none;
         }
 
         /* GERENCIADOR DE ARQUIVOS */
@@ -359,46 +378,67 @@
     <div class="main-container">
         <!-- ABA 1: CENTRAL PRINCIPAL -->
         <div id="view-main" class="view-section active grid-3col">
-            <!-- Painel Esquerdo: Vídeos de Dança Dinâmicos Sincronizados com a Música -->
+            
+            <!-- PAINEL ESQUERDO: VÍDEOS DE DANÇA (Com link customizado do YouTube) -->
             <div class="panel">
-                <div class="panel-title" id="holoTitle">Vídeo de Dança // Sincronizado</div>
-                <div class="holo-projector-container" id="danceVideoContainer">
-                    <!-- Inserido dinamicamente via JS -->
+                <div class="panel-title">Vídeos de Dança Feminina</div>
+                <div class="video-display-container" id="danceVideoContainer"></div>
+                
+                <div class="control-group">
+                    <label>Colocar Link do YouTube (Vídeo de Dança)</label>
+                    <div class="url-input-row">
+                        <input type="text" id="customDanceUrl" placeholder="Cole o link do YouTube aqui...">
+                        <button onclick="loadCustomDanceUrl()">Carregar</button>
+                    </div>
                 </div>
-                <div class="jarvis-status-text" id="jarvisStatusText">Modo Dança Automático Ativo</div>
-                <div class="holo-controls">
-                    <button onclick="setDanceVideo('synthwave')">⚡ Synthwave</button>
-                    <button onclick="setDanceVideo('pop')">✨ Pop Dance</button>
-                    <button onclick="setDanceVideo('club')">🔥 Club / Electronic</button>
+
+                <div class="control-group">
+                    <label>Estilos de Dança Rápida</label>
+                    <div class="btn-row">
+                        <button onclick="setDanceVideo('synthwave')">⚡ Synthwave</button>
+                        <button onclick="setDanceVideo('pop')">✨ Pop Dance</button>
+                        <button onclick="setDanceVideo('club')">🔥 Club Beats</button>
+                    </div>
                 </div>
+                <div class="jarvis-status-text" id="jarvisStatusText">Modo de Dança Ativo</div>
             </div>
 
-            <!-- Painel Central: Chat Rápido -->
+            <!-- PAINEL CENTRAL: NÚCLEO DE DIÁLOGO (Responde apenas quando acionado) -->
             <div class="panel">
-                <div class="panel-title">Núcleo de Diálogo Ativo</div>
+                <div class="panel-title">Núcleo de Diálogo (Aguardando Comando)</div>
                 <div class="chat-box" id="mainChatBox"></div>
                 <div class="input-area">
-                    <input type="text" id="mainPromptInput" placeholder="Fale com o J.A.R.V.I.S. (Ele só responde quando acionado)..." autocomplete="off">
-                    <button id="mainMicBtn" class="mic-btn" title="Voz">🎙️</button>
+                    <input type="text" id="mainPromptInput" placeholder="Fale com o J.A.R.V.I.S...." autocomplete="off">
                     <button id="mainSendBtn">Enviar</button>
                 </div>
             </div>
 
-            <!-- Painel Direito: Multimídia -->
+            <!-- PAINEL DIREITO: PLAYER DE MÍDIA (Com link customizado para músicas) -->
             <div class="panel media-section">
-                <div class="panel-title">Player de Mídia</div>
-                <div class="folder-select">
-                    <label>Estilo Musical</label>
-                    <select id="folderSelect">
-                        <option value="cyber">Cyberpunk & Synthwave</option>
-                        <option value="pop">Pop & Dance Hits</option>
-                        <option value="club">Electronic & Club Beats</option>
-                    </select>
-                </div>
+                <div class="panel-title">Player de Mídia & Músicas</div>
+                
                 <div class="player-screen" id="playerScreen">
                     <div style="color: var(--text-dim); font-size: 0.78rem;">Mídia em espera</div>
                 </div>
                 <div class="track-info" id="trackInfo">Faixa: Nenhuma</div>
+
+                <div class="control-group">
+                    <label>Colocar Link do YouTube (Música)</label>
+                    <div class="url-input-row">
+                        <input type="text" id="customMusicUrl" placeholder="Cole o link de áudio/vídeo...">
+                        <button onclick="loadCustomMusicUrl()">Tocar</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Playlists Pré-definidas</label>
+                    <select id="folderSelect">
+                        <option value="cyber">Cyberpunk & Synthwave Mix</option>
+                        <option value="pop">Pop & Dance Hits Mix</option>
+                        <option value="club">Electronic Club Beats</option>
+                    </select>
+                </div>
+
                 <div class="player-controls">
                     <button id="prevBtn">⏮ Anterior</button>
                     <button id="playPauseBtn">⏯ Play</button>
@@ -470,6 +510,13 @@
                 document.getElementById('view-files').classList.add('active');
                 event.target.classList.add('active');
             }
+        }
+
+        // Extrator de ID do YouTube
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
         }
 
         // Sincronização de Chat e Memória
@@ -585,11 +632,11 @@
         expandedSendBtn.addEventListener('click', () => processJarvisCommand(expandedPromptInput.value));
         expandedPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(expandedPromptInput.value); });
 
-        // --- VÍDEOS DE DANÇA DO YOUTUBE (Sincronizados com o Estilo Musical) ---
+        // --- PAINEL ESQUERDO: VÍDEOS DE DANÇA ---
         const danceVideos = {
-            synthwave: "4xDzrJKXOOY", // Exemplo de Synthwave / Dance Visual
-            pop: "9bZkp7q19f0",       // Exemplo de Pop Dance / Hit
-            club: "kJQP7kiw5Fk"       // Exemplo de Electronic / Club Dance
+            synthwave: "4xDzrJKXOOY",
+            pop: "9bZkp7q19f0",
+            club: "kJQP7kiw5Fk"
         };
 
         function setDanceVideo(style) {
@@ -598,6 +645,69 @@
                 <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" allow="autoplay; encrypted-media"></iframe>
             `;
             jarvisStatusText.innerText = `Vídeo de Dança: ${style.toUpperCase()}`;
+        }
+
+        function loadCustomDanceUrl() {
+            const urlInput = document.getElementById('customDanceUrl').value;
+            const videoId = extractYouTubeId(urlInput);
+            if (!videoId) {
+                alert("Link do YouTube inválido, senhor.");
+                return;
+            }
+            document.getElementById('danceVideoContainer').innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" allow="autoplay; encrypted-media"></iframe>
+            `;
+            jarvisStatusText.innerText = "Vídeo personalizado carregado";
+            speakRobotVideoMsg("Vídeo de dança personalizado carregado.");
+        }
+
+        function speakRobotVideoMsg(txt) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(txt);
+                utterance.lang = 'pt-BR';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- PAINEL DIREITO: PLAYER DE MÍDIA ---
+        const playlists = {
+            cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
+            pop: [{title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"}],
+            club: [{title: "Electronic Club Beats", id: "kJQP7kiw5Fk"}]
+        };
+        let currentFolder = 'cyber';
+
+        function loadTrack(videoId, title) {
+            document.getElementById('playerScreen').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay"></iframe>`;
+            document.getElementById('trackInfo').innerText = `Faixa: ${title}`;
+        }
+
+        document.getElementById('folderSelect').addEventListener('change', (e) => {
+            currentFolder = e.target.value;
+            const track = playlists[currentFolder][0];
+            loadTrack(track.id, track.title);
+            setDanceVideo(currentFolder);
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            const track = playlists[currentFolder][0];
+            loadTrack(track.id, track.title);
+        });
+
+        document.getElementById('playPauseBtn').addEventListener('click', () => {
+            const track = playlists[currentFolder][0];
+            loadTrack(track.id, track.title);
+        });
+
+        function loadCustomMusicUrl() {
+            const urlInput = document.getElementById('customMusicUrl').value;
+            const videoId = extractYouTubeId(urlInput);
+            if (!videoId) {
+                alert("Link de música do YouTube inválido, senhor.");
+                return;
+            }
+            loadTrack(videoId, "Música Personalizada do YouTube");
+            speakRobotVideoMsg("Música personalizada carregada.");
         }
 
         // --- GERENCIADOR DE ARQUIVOS (PC / CELULAR) ---
@@ -616,7 +726,7 @@
                 });
             }
             renderFileList();
-            speakRobotVoice(`${files.length} itens importados com sucesso.`);
+            speakRobotVideoMsg(`${files.length} itens importados com sucesso.`);
         }
 
         fileInputHidden.addEventListener('change', (e) => handleFileSelection(e.target.files));
@@ -662,33 +772,7 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
-            speakRobotVoice("Pacote de arquivos baixado.");
-        });
-
-        // Player de Mídia
-        const playlists = {
-            cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
-            pop: [{title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"}],
-            club: [{title: "Electronic Club Beats", id: "kJQP7kiw5Fk"}]
-        };
-        let currentFolder = 'cyber';
-
-        function loadTrack(videoId, title) {
-            document.getElementById('playerScreen').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay"></iframe>`;
-            document.getElementById('trackInfo').innerText = `Faixa: ${title}`;
-        }
-
-        document.getElementById('folderSelect').addEventListener('change', (e) => {
-            currentFolder = e.target.value;
-            const track = playlists[currentFolder][0];
-            loadTrack(track.id, track.title);
-            setDanceVideo(currentFolder);
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            const track = playlists[currentFolder][0];
-            loadTrack(track.id, track.title);
-            speakRobotVoice("Mídia atualizada.");
+            speakRobotVideoMsg("Pacote de arquivos baixado.");
         });
 
         // Inicialização Geral
