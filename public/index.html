@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. // Stark Core Holographic UI</title>
+    <title>J.A.R.V.I.S. // Stark Core OS v4.5</title>
+    <!-- Three.js para Holografia 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --bg-color: #030712;
-            --panel-bg: rgba(3, 15, 30, 0.9);
+            --panel-bg: rgba(3, 15, 30, 0.92);
             --neon-cyan: #00f0ff;
             --neon-magenta: #ff007f;
             --neon-glow: rgba(0, 240, 255, 0.5);
@@ -51,13 +53,58 @@
             text-shadow: 0 0 8px var(--neon-cyan);
         }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 360px 1fr 380px;
+        /* Sistema de Abas de Navegação Superior */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            background: rgba(0,240,255,0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: rgba(0,240,255,0.25);
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-glow);
+        }
+
+        .main-container {
             flex: 1;
-            gap: 15px;
             padding: 15px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-section {
+            display: none;
+            flex: 1;
+            gap: 15px;
+            overflow: hidden;
+        }
+
+        .view-section.active {
+            display: grid;
+        }
+
+        /* Grid padrão do JARVIS (3 Colunas) */
+        .grid-3col {
+            grid-template-columns: 340px 1fr 360px;
+        }
+
+        /* Grid da aba de Arquivos */
+        .grid-files {
+            grid-template-columns: 1fr 1fr;
         }
 
         .panel {
@@ -69,6 +116,7 @@
             padding: 15px;
             box-shadow: inset 0 0 20px rgba(0,240,255,0.06);
             position: relative;
+            overflow: hidden;
         }
 
         .panel-title {
@@ -81,7 +129,7 @@
             padding-bottom: 6px;
         }
 
-        /* PAINEL ESQUERDO: HOLOGRAFIA DA MULHER DANÇANDO (CANVAS) */
+        /* HOLOGRAFIA 3D */
         .holo-projector-container {
             flex: 1;
             display: flex;
@@ -89,15 +137,14 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, #02060d 80%);
+            background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, #02060d 85%);
             border-radius: 8px;
             margin: 5px 0;
             border: 1px solid var(--border-color);
-            overflow: hidden;
-            min-height: 280px;
+            min-height: 240px;
         }
 
-        #dancerCanvas {
+        #webglCanvas {
             width: 100%;
             height: 100%;
             position: absolute;
@@ -127,7 +174,7 @@
             text-shadow: 0 0 5px var(--neon-cyan);
         }
 
-        /* CHAT CENTER */
+        /* CHAT INTERATIVO */
         .chat-box {
             flex: 1;
             overflow-y: auto;
@@ -144,6 +191,7 @@
             font-size: 0.85rem;
             line-height: 1.4;
             max-width: 85%;
+            word-break: break-word;
         }
 
         .message.jarvis {
@@ -204,17 +252,11 @@
             box-shadow: 0 0 12px #ff3333;
         }
 
-        /* MEDIA & PLAYER (RIGHT) */
+        /* MEDIA & PLAYER */
         .media-section {
             display: flex;
             flex-direction: column;
             gap: 10px;
-        }
-
-        .folder-select, .url-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
 
         label {
@@ -234,7 +276,7 @@
 
         .player-screen {
             width: 100%;
-            height: 160px;
+            height: 150px;
             background: #000;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -270,112 +312,195 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* GERENCIADOR DE ARQUIVOS E PASTAS (PC/CELULAR) */
+        .drop-zone {
+            border: 2px dashed var(--neon-cyan);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            background: rgba(0, 240, 255, 0.03);
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .drop-zone:hover {
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: 0 0 12px var(--neon-glow);
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            background: rgba(0,5,10,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(0,240,255,0.05);
+            border: 1px solid rgba(0,240,255,0.15);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>JARVIS // STARK CORE v4.2</h1>
-        <div style="font-size: 0.75rem; color: var(--neon-cyan);">ESTADO: OPERACIONAL</div>
+        <h1>JARVIS // STARK CORE OS</h1>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('main')">💻 Central Principal</button>
+            <button class="tab-btn" onclick="switchTab('chat')">💬 Chat & IA</button>
+            <button class="tab-btn" onclick="switchTab('files')">📂 Arquivos & Dispositivo</button>
+        </div>
     </header>
 
-    <div class="main-grid">
-        <!-- PAINEL ESQUERDO: HOLOGRAFIA DA MULHER DANÇANDO -->
-        <div class="panel">
-            <div class="panel-title">Holograma 3D // Dançarina Sensual</div>
-            <div class="holo-projector-container">
-                <canvas id="dancerCanvas"></canvas>
-            </div>
-            <div class="jarvis-status-text" id="jarvisStatusText">Coreógrafo Holográfico Ativo</div>
-            <div class="holo-controls">
-                <button onclick="setDanceMode('synthwave')">⚡ Synthwave</button>
-                <button onclick="setDanceMode('sensual')">✨ Sensual Wave</button>
-                <button onclick="setDanceMode('club')">🔥 Club Beat</button>
-            </div>
-            <div style="margin-top: 8px; text-align: center;">
-                <button id="clearMemoryBtn" style="font-size: 0.7rem; padding: 4px 10px;">Limpar Memória</button>
-            </div>
-        </div>
-
-        <!-- PAINEL CENTRAL: NÚCLEO DE INTELIGÊNCIA & DIÁLOGO -->
-        <div class="panel">
-            <div class="panel-title">Núcleo de Inteligência & Memória Ilimitada</div>
-            <div class="chat-box" id="chatBox"></div>
-            <div class="input-area">
-                <input type="text" id="promptInput" placeholder="Digite seu comando para o J.A.R.V.I.S...." autocomplete="off">
-                <button id="micBtn" class="mic-btn" title="Comando por Voz">🎙️ Falar</button>
-                <button id="sendBtn">Enviar</button>
-            </div>
-        </div>
-
-        <!-- PAINEL DIREITO: MULTIMÍDIA -->
-        <div class="panel media-section">
-            <div class="panel-title">Controle de Mídia & Playlists</div>
-            
-            <div class="folder-select">
-                <label>Pasta / Playlist Atual</label>
-                <select id="folderSelect">
-                    <option value="cyber">Cyberpunk & Synthwave (Ritmo Ágil)</option>
-                    <option value="epic">Trilhas Épicas Stark (Ritmo Forte)</option>
-                    <option value="relax">Foco & Concentração (Ritmo Suave)</option>
-                </select>
-            </div>
-
-            <div class="url-input-group">
-                <label>Link Editável (YouTube / Stream)</label>
-                <div style="display: flex; gap: 5px;">
-                    <input type="text" id="customUrlInput" class="custom-input" placeholder="Cole o link do YouTube aqui...">
-                    <button id="loadUrlBtn">Carregar</button>
+    <div class="main-container">
+        <!-- ABA 1: CENTRAL PRINCIPAL (Holograma + Chat Rápido + Player) -->
+        <div id="view-main" class="view-section active grid-3col">
+            <!-- Painel Esquerdo: Holografia 3D -->
+            <div class="panel">
+                <div class="panel-title">Holograma 3D // Dançarina Sensual</div>
+                <div class="holo-projector-container">
+                    <canvas id="webglCanvas"></canvas>
+                </div>
+                <div class="jarvis-status-text" id="jarvisStatusText">Engine 3D Operacional</div>
+                <div class="holo-controls">
+                    <button onclick="setDanceMode('synthwave')">⚡ Synthwave</button>
+                    <button onclick="setDanceMode('sensual')">✨ Sensual Wave</button>
+                    <button onclick="setDanceMode('club')">🔥 Club Beat</button>
                 </div>
             </div>
 
-            <div class="player-screen" id="playerScreen">
-                <div style="color: var(--text-dim); font-size: 0.78rem; text-align: center;">
-                    Nenhuma mídia ativa
+            <!-- Painel Central: Chat Rápido -->
+            <div class="panel">
+                <div class="panel-title">Núcleo de Inteligência</div>
+                <div class="chat-box" id="mainChatBox"></div>
+                <div class="input-area">
+                    <input type="text" id="mainPromptInput" placeholder="Comande o J.A.R.V.I.S...." autocomplete="off">
+                    <button id="mainMicBtn" class="mic-btn" title="Voz">🎙️</button>
+                    <button id="mainSendBtn">Enviar</button>
                 </div>
             </div>
 
-            <div class="track-info" id="trackInfo">Faixa: Aguardando seleção...</div>
+            <!-- Painel Direito: Multimídia -->
+            <div class="panel media-section">
+                <div class="panel-title">Player de Mídia</div>
+                <div class="folder-select">
+                    <label>Playlist Ativa</label>
+                    <select id="folderSelect">
+                        <option value="cyber">Cyberpunk & Synthwave</option>
+                        <option value="epic">Trilhas Épicas Stark</option>
+                        <option value="relax">Foco & Lofi</option>
+                    </select>
+                </div>
+                <div class="player-screen" id="playerScreen">
+                    <div style="color: var(--text-dim); font-size: 0.78rem;">Mídia em espera</div>
+                </div>
+                <div class="track-info" id="trackInfo">Faixa: Nenhuma</div>
+                <div class="player-controls">
+                    <button id="prevBtn">⏮ Anterior</button>
+                    <button id="playPauseBtn">⏯ Play</button>
+                    <button id="nextBtn">⏭ Próxima</button>
+                </div>
+            </div>
+        </div>
 
-            <div class="player-controls">
-                <button id="prevBtn">⏮ Anterior</button>
-                <button id="playPauseBtn">⏯ Play/Pause</button>
-                <button id="nextBtn">⏭ Avançar</button>
+        <!-- ABA 2: CHAT & CONVERSA EXPANDIDA -->
+        <div id="view-chat" class="view-section" style="grid-template-columns: 1fr;">
+            <div class="panel" style="max-width: 900px; margin: 0 auto; width: 100%;">
+                <div class="panel-title">Histórico Completo de Conversas & Diálogo Neural com J.A.R.V.I.S.</div>
+                <div class="chat-box" id="expandedChatBox" style="flex: 1; max-height: calc(100vh - 220px);"></div>
+                <div class="input-area" style="margin-top: 10px;">
+                    <input type="text" id="expandedPromptInput" placeholder="Digite sua mensagem detalhada para o J.A.R.V.I.S...." autocomplete="off">
+                    <button id="expandedSendBtn">Enviar Mensagem</button>
+                    <button id="clearMemoryBtn" style="background: rgba(255,0,0,0.15); border-color: #ff3333; color: #ff6666;">Limpar Memória</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: ARQUIVOS & DISPOSITIVO (PC / CELULAR) -->
+        <div id="view-files" class="view-section grid-files">
+            <!-- Coluna 1: Importar / Baixar do PC ou Celular -->
+            <div class="panel">
+                <div class="panel-title">Importar Pastas e Arquivos (PC / Celular)</div>
+                <div class="drop-zone" onclick="document.getElementById('fileInputHidden').click()">
+                    <div style="font-size: 1.8rem; margin-bottom: 8px;">📂📱</div>
+                    <div style="color: var(--neon-cyan); font-weight: bold; font-size: 0.9rem;">Toque ou Arraste Pastas/Arquivos Aqui</div>
+                    <div style="color: var(--text-dim); font-size: 0.72rem; margin-top: 4px;">Suporta seleção múltipla do seu dispositivo móvel ou computador</div>
+                </div>
+                <input type="file" id="fileInputHidden" webkitdirectory directory multiple style="display: none;">
+                <input type="file" id="fileSingleHidden" multiple style="display: none;">
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <button onclick="document.getElementById('fileSingleHidden').click()" style="flex: 1; padding: 8px;">Selecionar Arquivos</button>
+                    <button onclick="document.getElementById('fileInputHidden').click()" style="flex: 1; padding: 8px;">Selecionar Pasta Inteira</button>
+                </div>
+
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px;">
+                    * Arquivos carregados são processados localmente no buffer seguro do J.A.R.V.I.S. para uso imediato.
+                </div>
+            </div>
+
+            <!-- Coluna 2: Gerenciador e Download de Arquivos Sincronizados -->
+            <div class="panel">
+                <div class="panel-title">Buffer de Arquivos Sincronizados no Sistema</div>
+                <div class="file-list" id="fileListContainer">
+                    <div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; margin-top: 40px;">
+                        Nenhum arquivo ou pasta importado no momento.
+                    </div>
+                </div>
+                <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span id="fileCountStatus" style="font-size: 0.72rem; color: var(--neon-cyan);">Total: 0 itens</span>
+                    <button id="downloadAllFilesBtn" style="font-size: 0.75rem; padding: 6px 12px;">Baixar Pacote do Sistema</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const chatBox = document.getElementById('chatBox');
-        const promptInput = document.getElementById('promptInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const micBtn = document.getElementById('micBtn');
+        // Sistema de Abas
+        function switchTab(tabName) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (tabName === 'main') {
+                document.getElementById('view-main').classList.add('active');
+                event.target.classList.add('active');
+            } else if (tabName === 'chat') {
+                document.getElementById('view-chat').classList.add('active');
+                event.target.classList.add('active');
+                syncChatBoxes();
+            } else if (tabName === 'files') {
+                document.getElementById('view-files').classList.add('active');
+                event.target.classList.add('active');
+            }
+        }
+
+        // Memória e Mensagens Sincronizadas
+        const mainChatBox = document.getElementById('mainChatBox');
+        const expandedChatBox = document.getElementById('expandedChatBox');
+        const mainPromptInput = document.getElementById('mainPromptInput');
+        const expandedPromptInput = document.getElementById('expandedPromptInput');
+        const mainSendBtn = document.getElementById('mainSendBtn');
+        const expandedSendBtn = document.getElementById('expandedSendBtn');
         const clearMemoryBtn = document.getElementById('clearMemoryBtn');
         const jarvisStatusText = document.getElementById('jarvisStatusText');
 
-        const folderSelect = document.getElementById('folderSelect');
-        const customUrlInput = document.getElementById('customUrlInput');
-        const loadUrlBtn = document.getElementById('loadUrlBtn');
-        const playerScreen = document.getElementById('playerScreen');
-        const trackInfo = document.getElementById('trackInfo');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
-
-        // Playlists
-        const playlists = {
-            cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}, {title: "Neon Horizon", id: "V9Pj2sbYJqw"}],
-            epic: [{title: "Stark Orchestral Suite", id: "2S24-y0Ij3Y"}, {title: "Iron Protocol Theme", id: "7wtfhZwyrcc"}],
-            relax: [{title: "Ambient Core Soundscapes", id: "5qap5aO4i9A"}, {title: "Stark Lab Atmosphere", id: "jfKfPfyJRdk"}],
-        };
-
-        let currentFolder = 'cyber';
-        let currentIndex = 0;
-
-        // Histórico de Conversa (LocalStorage)
         function loadChatHistory() {
             const history = JSON.parse(localStorage.getItem('jarvis_chat_history') || '[]');
             if (history.length === 0) {
-                appendMessage('jarvis', 'Bom dia, senhor. O Stark Core está operacional. Como posso auxiliá-lo?');
+                appendMessage('jarvis', 'Sistemas operacionais online, senhor. Como posso auxiliar?', false);
             } else {
                 history.forEach(msg => appendMessage(msg.sender, msg.text, false));
             }
@@ -388,24 +513,39 @@
         }
 
         function appendMessage(sender, text, save = true) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            msgDiv.innerText = text;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Adiciona na tela principal
+            const d1 = document.createElement('div');
+            d1.className = `message ${sender}`;
+            d1.innerText = text;
+            mainChatBox.appendChild(d1);
+            mainChatBox.scrollTop = mainChatBox.scrollHeight;
+
+            // Adiciona na aba de chat expandido
+            const d2 = document.createElement('div');
+            d2.className = `message ${sender}`;
+            d2.innerText = text;
+            expandedChatBox.appendChild(d2);
+            expandedChatBox.scrollTop = expandedChatBox.scrollHeight;
+
             if (save) saveMessageToHistory(sender, text);
+        }
+
+        function syncChatBoxes() {
+            mainChatBox.innerHTML = '';
+            expandedChatBox.innerHTML = '';
+            loadChatHistory();
         }
 
         clearMemoryBtn.addEventListener('click', () => {
             if(confirm("Deseja apagar todo o registro de memória, senhor?")) {
                 localStorage.removeItem('jarvis_chat_history');
-                chatBox.innerHTML = '';
+                mainChatBox.innerHTML = '';
+                expandedChatBox.innerHTML = '';
                 appendMessage('jarvis', 'Memória redefinida com sucesso, senhor.');
                 speakRobotVoice("Memória redefinida, senhor.");
             }
         });
 
-        // Voz Robótica Masculina em PT-BR
         function speakRobotVoice(text) {
             if (!('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
@@ -413,219 +553,21 @@
             utterance.lang = 'pt-BR';
             utterance.rate = 1.05;
             utterance.pitch = 0.55;
-            
             const voices = window.speechSynthesis.getVoices();
-            const ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.includes('Daniel') || v.name.includes('Google') || v.name.includes('Male') || v.name.includes('Antônio')));
+            const ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.includes('Daniel') || v.name.includes('Google') || v.name.includes('Male')));
             if (ptVoice) utterance.voice = ptVoice;
-
             window.speechSynthesis.speak(utterance);
         }
 
-        // CANVAS HOLOGRÁFICO DA DANÇARINA SENSUAL DETALHADA
-        const canvas = document.getElementById('dancerCanvas');
-        const ctx = canvas.getContext('2d');
-        let danceMode = 'synthwave';
-        let animAngle = 0;
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight - 40;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function setDanceMode(mode) {
-            danceMode = mode;
-            jarvisStatusText.innerText = `Modo Ativo: ${mode.toUpperCase()}`;
-            speakRobotVoice(`Modo de dança alterado para ${mode}, senhor.`);
-        }
-
-        function drawHolographicDancer() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2 + 20;
-
-            animAngle += (danceMode === 'club' ? 0.08 : danceMode === 'sensual' ? 0.04 : 0.06);
-
-            // Efeito de grade holográfica de fundo
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < canvas.height; i += 15) {
-                ctx.beginPath();
-                ctx.moveTo(0, i);
-                ctx.lineTo(canvas.width, i);
-                ctx.stroke();
-            }
-
-            // Parâmetros de ondulação corporal baseados na música
-            const hipSway = Math.sin(animAngle * 2) * 12;
-            const torsoTwist = Math.cos(animAngle) * 8;
-            const armWave = Math.sin(animAngle * 1.5) * 20;
-
-            ctx.save();
-            ctx.translate(cx, cy);
-
-            // Brilho Néon Holográfico
-            ctx.shadowColor = danceMode === 'sensual' ? '#ff007f' : '#00f0ff';
-            ctx.shadowBlur = 15;
-            ctx.strokeStyle = danceMode === 'sensual' ? '#ff007f' : '#00f0ff';
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
-            ctx.lineWidth = 2.5;
-
-            // 1. Cabeça com Cabelos Esvoaçantes
-            ctx.beginPath();
-            ctx.arc(torsoTwist * 0.5, -75, 18, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            // Cabelos longos flutuando
-            ctx.beginPath();
-            ctx.moveTo(torsoTwist * 0.5 - 10, -85);
-            ctx.quadraticCurveTo(torsoTwist - 35, -50, torsoTwist - 20 + hipSway * 0.5, -20);
-            ctx.stroke();
-
-            // 2. Tronco & Busto (Curvas Orgânicas Sensuais)
-            ctx.beginPath();
-            ctx.moveTo(-12, -55);
-            ctx.quadraticCurveTo(-15 + torsoTwist, -25, -16 + hipSway * 0.5, 0); // Lado esquerdo
-            ctx.lineTo(16 + hipSway * 0.5, 0); // Cintura / Quadris
-            ctx.quadraticCurveTo(15 + torsoTwist, -25, 12, -55); // Lado direito
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-
-            // 3. Braços Dinâmicos
-            // Braço Esquerdo
-            ctx.beginPath();
-            ctx.moveTo(-12, -50);
-            ctx.quadraticCurveTo(-35 + armWave, -30, -20 + armWave * 0.8, -5);
-            ctx.stroke();
-
-            // Braço Direito
-            ctx.beginPath();
-            ctx.moveTo(12, -50);
-            ctx.quadraticCurveTo(35 - armWave, -30, 20 - armWave * 0.8, -5);
-            ctx.stroke();
-
-            // 4. Pernas com Rebolado Fluido
-            // Perna Esquerda
-            ctx.beginPath();
-            ctx.moveTo(-10 + hipSway * 0.5, 0);
-            ctx.quadraticCurveTo(-18 + hipSway, 40, -12 + hipSway * 1.2, 80);
-            ctx.stroke();
-
-            // Perna Direita
-            ctx.beginPath();
-            ctx.moveTo(10 + hipSway * 0.5, 0);
-            ctx.quadraticCurveTo(18 + hipSway, 40, 12 + hipSway * 1.2, 80);
-            ctx.stroke();
-
-            // Base do Emitidor Holográfico em Anel
-            ctx.restore();
-            ctx.strokeStyle = '#00f0ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.ellipse(cx, cy + 95, 60, 18, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
-            ctx.fill();
-
-            requestAnimationFrame(drawHolographicDancer);
-        }
-        drawHolographicDancer();
-
-        // Carregar Mídia & Sincronizar com Pastas
-        function loadTrack(videoId, title) {
-            playerScreen.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
-            trackInfo.innerText = `Faixa: ${title}`;
-            
-            if (currentFolder === 'cyber') setDanceMode('synthwave');
-            else if (currentFolder === 'epic') setDanceMode('club');
-            else setDanceMode('sensual');
-        }
-
-        folderSelect.addEventListener('change', (e) => {
-            currentFolder = e.target.value;
-            currentIndex = 0;
-            const track = playlists[currentFolder][currentIndex];
-            loadTrack(track.id, track.title);
-        });
-
-        nextBtn.addEventListener('click', () => {
-            const list = playlists[currentFolder];
-            currentIndex = (currentIndex + 1) % list.length;
-            const track = list[currentIndex];
-            loadTrack(track.id, track.title);
-            speakRobotVoice("Avançando para a próxima faixa, senhor.");
-        });
-
-        prevBtn.addEventListener('click', () => {
-            const list = playlists[currentFolder];
-            currentIndex = (currentIndex - 1 + list.length) % list.length;
-            const track = list[currentIndex];
-            loadTrack(track.id, track.title);
-            speakRobotVoice("Retornando à faixa anterior, senhor.");
-        });
-
-        loadUrlBtn.addEventListener('click', () => {
-            const url = customUrlInput.value.trim();
-            if(!url) return;
-            let videoId = '';
-            if(url.includes('youtu.be/')) {
-                videoId = url.split('youtu.be/')[1].split('?')[0];
-            } else if(url.includes('watch?v=')) {
-                videoId = url.split('watch?v=')[1].split('&')[0];
-            }
-            if(videoId) {
-                loadTrack(videoId, "Link Personalizado do YouTube");
-                speakRobotVoice("Mídia externa carregada, senhor.");
-            } else {
-                alert("Por favor, insira um link válido do YouTube, senhor.");
-            }
-        });
-
-        // Reconhecimento de Voz (Microfone)
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            micBtn.addEventListener('click', () => {
-                recognition.start();
-                micBtn.classList.add('listening');
-                jarvisStatusText.innerText = 'Ouvindo comando de voz...';
-            });
-
-            recognition.onresult = (event) => {
-                const speechText = event.results[0][0].transcript;
-                promptInput.value = speechText;
-                micBtn.classList.remove('listening');
-                sendCommand();
-            };
-
-            recognition.onerror = () => {
-                micBtn.classList.remove('listening');
-                jarvisStatusText.innerText = 'Erro na captação de voz';
-            };
-
-            recognition.onend = () => {
-                micBtn.classList.remove('listening');
-            };
-        } else {
-            micBtn.style.display = 'none';
-        }
-
-        // Comunicação com o Servidor /api/jarvis
-        async function sendCommand() {
-            const text = promptInput.value.trim();
+        // Comunicação com o Backend /api/jarvis
+        async function processJarvisCommand(textInput) {
+            const text = textInput.trim();
             if (!text) return;
 
             appendMessage('user', text);
-            promptInput.value = '';
-            jarvisStatusText.innerText = 'Processando requisição...';
+            mainPromptInput.value = '';
+            expandedPromptInput.value = '';
+            jarvisStatusText.innerText = 'Processando...';
 
             try {
                 const response = await fetch('/api/jarvis', {
@@ -638,34 +580,215 @@
 
                 if (response.ok && data.response) {
                     appendMessage('jarvis', data.response);
-                    jarvisStatusText.innerText = 'Respondendo ao senhor';
+                    jarvisStatusText.innerText = 'Engine 3D Operacional';
                     speakRobotVoice(data.response);
-                    setTimeout(() => jarvisStatusText.innerText = 'Coreógrafo Holográfico Ativo', 4000);
                 } else {
-                    const errText = data.error || "Ocorreu um erro no núcleo, senhor.";
-                    appendMessage('jarvis', errText);
-                    jarvisStatusText.innerText = 'Atenção Requerida';
-                    speakRobotVoice("Houve uma falha no processamento, senhor.");
+                    const err = data.error || "Falha no núcleo, senhor.";
+                    appendMessage('jarvis', err);
+                    jarvisStatusText.innerText = 'Erro no Núcleo';
+                    speakRobotVoice("Falha no processamento.");
                 }
-
-            } catch (err) {
-                console.error(err);
-                appendMessage('jarvis', "Falha de comunicação com o núcleo de inteligência, senhor.");
+            } catch (e) {
+                console.error(e);
+                appendMessage('jarvis', "Erro de conexão com o servidor Stark, senhor.");
                 jarvisStatusText.innerText = 'Erro de Conexão';
-                speakRobotVoice("Falha de comunicação com o núcleo de inteligência, senhor.");
+                speakRobotVoice("Erro de conexão.");
             }
         }
 
-        sendBtn.addEventListener('click', sendCommand);
-        promptInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendCommand();
+        mainSendBtn.addEventListener('click', () => processJarvisCommand(mainPromptInput.value));
+        mainPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(mainPromptInput.value); });
+
+        expandedSendBtn.addEventListener('click', () => processJarvisCommand(expandedPromptInput.value));
+        expandedPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(expandedPromptInput.value); });
+
+        // --- GERENCIADOR DE ARQUIVOS E PASTAS (PC / CELULAR) ---
+        let importedFiles = [];
+        const fileInputHidden = document.getElementById('fileInputHidden');
+        const fileSingleHidden = document.getElementById('fileSingleHidden');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const fileCountStatus = document.getElementById('fileCountStatus');
+
+        function handleFileSelection(files) {
+            for (let i = 0; i < files.length; i++) {
+                importedFiles.push({
+                    name: files[i].webkitRelativePath || files[i].name,
+                    size: (files[i].size / 1024).toFixed(1) + ' KB',
+                    raw: files[i]
+                });
+            }
+            renderFileList();
+            speakRobotVoice(`${files.length} arquivos importados com sucesso, senhor.`);
+        }
+
+        fileInputHidden.addEventListener('change', (e) => handleFileSelection(e.target.files));
+        fileSingleHidden.addEventListener('change', (e) => handleFileSelection(e.target.files));
+
+        function renderFileList() {
+            fileListContainer.innerHTML = '';
+            if (importedFiles.length === 0) {
+                fileListContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; margin-top: 40px;">Nenhum arquivo ou pasta importado no momento.</div>`;
+                fileCountStatus.innerText = 'Total: 0 itens';
+                return;
+            }
+
+            fileCountStatus.innerText = `Total: ${importedFiles.length} itens`;
+            importedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;">${file.name} (${file.size})</span>
+                    <button onclick="removeImportedFile(${index})" style="font-size: 0.65rem; padding: 2px 6px; background: rgba(255,0,0,0.15); border-color: #ff3333; color: #ff6666;">Remover</button>
+                `;
+                fileListContainer.appendChild(item);
+            });
+        }
+
+        function removeImportedFile(index) {
+            importedFiles.splice(index, 1);
+            renderFileList();
+        }
+
+        document.getElementById('downloadAllFilesBtn').addEventListener('click', () => {
+            if (importedFiles.length === 0) {
+                alert("Nenhum arquivo no buffer para baixar, senhor.");
+                return;
+            }
+            importedFiles.forEach(file => {
+                const url = URL.createObjectURL(file.raw);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            speakRobotVoice("Pacote de arquivos baixado para o seu dispositivo, senhor.");
         });
 
-        // Inicialização
+        // --- RENDERIZADOR 3D (THREE.JS) ---
+        let scene, camera, renderer;
+        let head, torso, hips, leftArm, rightArm, leftLeg, rightLeg;
+        let danceMode = 'synthwave';
+        let clock = new THREE.Clock();
+
+        function init3D() {
+            const container = document.querySelector('.holo-projector-container');
+            if (!container) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 1.2, 5.2);
+
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webglCanvas'), antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            scene.add(new THREE.AmbientLight(0x00f0ff, 0.8));
+            const pointLight = new THREE.PointLight(0x00f0ff, 2, 10);
+            pointLight.position.set(0, 2, 2);
+            scene.add(pointLight);
+
+            const holoMaterial = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x0088ff, emissiveIntensity: 0.6, wireframe: true });
+            const solidMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x0044aa, emissiveIntensity: 0.4 });
+
+            hips = new THREE.Group();
+            scene.add(hips);
+
+            torso = new THREE.Group();
+            torso.position.y = 0.6;
+            hips.add(torso);
+
+            const chest = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.18, 0.8, 12), holoMaterial);
+            chest.position.y = 0.1;
+            torso.add(chest);
+
+            head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), solidMat);
+            head.position.y = 0.7;
+            torso.add(head);
+
+            leftArm = new THREE.Group();
+            leftArm.position.set(-0.38, 0.45, 0);
+            leftArm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.7, 8), solidMat)).position.y = -0.3;
+            torso.add(leftArm);
+
+            rightArm = new THREE.Group();
+            rightArm.position.set(0.38, 0.45, 0);
+            rightArm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.7, 8), solidMat)).position.y = -0.3;
+            torso.add(rightArm);
+
+            leftLeg = new THREE.Group();
+            leftLeg.position.set(-0.18, -0.2, 0);
+            leftLeg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.07, 1.1, 8), solidMat)).position.y = -0.55;
+            hips.add(leftLeg);
+
+            rightLeg = new THREE.Group();
+            rightLeg.position.set(0.18, -0.2, 0);
+            rightLeg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.07, 1.1, 8), solidMat)).position.y = -0.55;
+            hips.add(rightLeg);
+
+            window.addEventListener('resize', () => {
+                if(!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        function setDanceMode(mode) {
+            danceMode = mode;
+            jarvisStatusText.innerText = `Modo: ${mode.toUpperCase()}`;
+            speakRobotVoice(`Modo 3D alterado para ${mode}, senhor.`);
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            const t = clock.getElapsedTime() * (danceMode === 'club' ? 4.5 : danceMode === 'sensual' ? 2.2 : 3.2);
+
+            if (hips && torso && leftArm && rightArm && leftLeg && rightLeg) {
+                hips.rotation.y = Math.sin(t) * 0.4;
+                hips.position.x = Math.sin(t * 2) * 0.15;
+                torso.rotation.z = Math.sin(t) * 0.15;
+                leftArm.rotation.z = Math.sin(t * 1.5) * 0.6 + 0.5;
+                rightArm.rotation.z = -Math.sin(t * 1.5) * 0.6 - 0.5;
+                leftLeg.rotation.x = Math.sin(t) * 0.4;
+                rightLeg.rotation.x = -Math.sin(t) * 0.4;
+            }
+            if(renderer && scene && camera) renderer.render(scene, camera);
+        }
+
+        // Player de Mídia
+        const playlists = {
+            cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
+            epic: [{title: "Stark Orchestral Suite", id: "2S24-y0Ij3Y"}],
+            relax: [{title: "Ambient Core Soundscapes", id: "5qap5aO4i9A"}]
+        };
+        let currentFolder = 'cyber';
+
+        function loadTrack(videoId, title) {
+            document.getElementById('playerScreen').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay"></iframe>`;
+            document.getElementById('trackInfo').innerText = `Faixa: ${title}`;
+        }
+
+        document.getElementById('folderSelect').addEventListener('change', (e) => {
+            currentFolder = e.target.value;
+            const track = playlists[currentFolder][0];
+            loadTrack(track.id, track.title);
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            const track = playlists[currentFolder][0];
+            loadTrack(track.id, track.title);
+            speakRobotVoice("Mídia atualizada, senhor.");
+        });
+
+        // Inicialização Geral
         window.addEventListener('load', () => {
             loadChatHistory();
-            const initialTrack = playlists['cyber'][0];
-            loadTrack(initialTrack.id, initialTrack.title);
+            init3D();
+            animate3D();
+            loadTrack(playlists['cyber'][0].id, playlists['cyber'][0].title);
         });
     </script>
 </body>
