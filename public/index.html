@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. // Stark Core OS v4.5</title>
-    <!-- Three.js para Holografia 3D -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>J.A.R.V.I.S. // Stark Core OS v5.0</title>
     <style>
         :root {
             --bg-color: #030712;
-            --panel-bg: rgba(3, 15, 30, 0.92);
+            --panel-bg: rgba(3, 15, 30, 0.94);
             --neon-cyan: #00f0ff;
             --neon-magenta: #ff007f;
             --neon-glow: rgba(0, 240, 255, 0.5);
@@ -53,7 +51,6 @@
             text-shadow: 0 0 8px var(--neon-cyan);
         }
 
-        /* Sistema de Abas de Navegação Superior */
         .nav-tabs {
             display: flex;
             gap: 8px;
@@ -97,12 +94,10 @@
             display: grid;
         }
 
-        /* Grid padrão do JARVIS (3 Colunas) */
         .grid-3col {
-            grid-template-columns: 340px 1fr 360px;
+            grid-template-columns: 360px 1fr 360px;
         }
 
-        /* Grid da aba de Arquivos */
         .grid-files {
             grid-template-columns: 1fr 1fr;
         }
@@ -129,27 +124,25 @@
             padding-bottom: 6px;
         }
 
-        /* HOLOGRAFIA 3D */
+        /* PAINEL DE VÍDEO / HOLOGRAFIA DINÂMICA */
         .holo-projector-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             position: relative;
-            background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, #02060d 85%);
+            background: #000;
             border-radius: 8px;
             margin: 5px 0;
             border: 1px solid var(--border-color);
+            overflow: hidden;
             min-height: 240px;
         }
 
-        #webglCanvas {
+        .holo-projector-container iframe {
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            border: none;
+            pointer-events: auto;
         }
 
         .holo-controls {
@@ -157,12 +150,11 @@
             gap: 5px;
             margin-top: 8px;
             justify-content: center;
-            z-index: 2;
         }
 
         .holo-controls button {
             font-size: 0.65rem;
-            padding: 4px 8px;
+            padding: 5px 10px;
         }
 
         .jarvis-status-text {
@@ -170,7 +162,6 @@
             color: var(--neon-cyan);
             margin-top: 6px;
             text-align: center;
-            z-index: 2;
             text-shadow: 0 0 5px var(--neon-cyan);
         }
 
@@ -313,7 +304,7 @@
             text-overflow: ellipsis;
         }
 
-        /* GERENCIADOR DE ARQUIVOS E PASTAS (PC/CELULAR) */
+        /* GERENCIADOR DE ARQUIVOS */
         .drop-zone {
             border: 2px dashed var(--neon-cyan);
             border-radius: 8px;
@@ -366,28 +357,28 @@
     </header>
 
     <div class="main-container">
-        <!-- ABA 1: CENTRAL PRINCIPAL (Holograma + Chat Rápido + Player) -->
+        <!-- ABA 1: CENTRAL PRINCIPAL -->
         <div id="view-main" class="view-section active grid-3col">
-            <!-- Painel Esquerdo: Holografia 3D -->
+            <!-- Painel Esquerdo: Vídeos de Dança Dinâmicos Sincronizados com a Música -->
             <div class="panel">
-                <div class="panel-title">Holograma 3D // Dançarina Sensual</div>
-                <div class="holo-projector-container">
-                    <canvas id="webglCanvas"></canvas>
+                <div class="panel-title" id="holoTitle">Vídeo de Dança // Sincronizado</div>
+                <div class="holo-projector-container" id="danceVideoContainer">
+                    <!-- Inserido dinamicamente via JS -->
                 </div>
-                <div class="jarvis-status-text" id="jarvisStatusText">Engine 3D Operacional</div>
+                <div class="jarvis-status-text" id="jarvisStatusText">Modo Dança Automático Ativo</div>
                 <div class="holo-controls">
-                    <button onclick="setDanceMode('synthwave')">⚡ Synthwave</button>
-                    <button onclick="setDanceMode('sensual')">✨ Sensual Wave</button>
-                    <button onclick="setDanceMode('club')">🔥 Club Beat</button>
+                    <button onclick="setDanceVideo('synthwave')">⚡ Synthwave</button>
+                    <button onclick="setDanceVideo('pop')">✨ Pop Dance</button>
+                    <button onclick="setDanceVideo('club')">🔥 Club / Electronic</button>
                 </div>
             </div>
 
             <!-- Painel Central: Chat Rápido -->
             <div class="panel">
-                <div class="panel-title">Núcleo de Inteligência</div>
+                <div class="panel-title">Núcleo de Diálogo Ativo</div>
                 <div class="chat-box" id="mainChatBox"></div>
                 <div class="input-area">
-                    <input type="text" id="mainPromptInput" placeholder="Comande o J.A.R.V.I.S...." autocomplete="off">
+                    <input type="text" id="mainPromptInput" placeholder="Fale com o J.A.R.V.I.S. (Ele só responde quando acionado)..." autocomplete="off">
                     <button id="mainMicBtn" class="mic-btn" title="Voz">🎙️</button>
                     <button id="mainSendBtn">Enviar</button>
                 </div>
@@ -397,11 +388,11 @@
             <div class="panel media-section">
                 <div class="panel-title">Player de Mídia</div>
                 <div class="folder-select">
-                    <label>Playlist Ativa</label>
+                    <label>Estilo Musical</label>
                     <select id="folderSelect">
                         <option value="cyber">Cyberpunk & Synthwave</option>
-                        <option value="epic">Trilhas Épicas Stark</option>
-                        <option value="relax">Foco & Lofi</option>
+                        <option value="pop">Pop & Dance Hits</option>
+                        <option value="club">Electronic & Club Beats</option>
                     </select>
                 </div>
                 <div class="player-screen" id="playerScreen">
@@ -419,10 +410,10 @@
         <!-- ABA 2: CHAT & CONVERSA EXPANDIDA -->
         <div id="view-chat" class="view-section" style="grid-template-columns: 1fr;">
             <div class="panel" style="max-width: 900px; margin: 0 auto; width: 100%;">
-                <div class="panel-title">Histórico Completo de Conversas & Diálogo Neural com J.A.R.V.I.S.</div>
+                <div class="panel-title">Histórico Completo de Diálogo com J.A.R.V.I.S.</div>
                 <div class="chat-box" id="expandedChatBox" style="flex: 1; max-height: calc(100vh - 220px);"></div>
                 <div class="input-area" style="margin-top: 10px;">
-                    <input type="text" id="expandedPromptInput" placeholder="Digite sua mensagem detalhada para o J.A.R.V.I.S...." autocomplete="off">
+                    <input type="text" id="expandedPromptInput" placeholder="Digite sua mensagem para o J.A.R.V.I.S...." autocomplete="off">
                     <button id="expandedSendBtn">Enviar Mensagem</button>
                     <button id="clearMemoryBtn" style="background: rgba(255,0,0,0.15); border-color: #ff3333; color: #ff6666;">Limpar Memória</button>
                 </div>
@@ -431,7 +422,6 @@
 
         <!-- ABA 3: ARQUIVOS & DISPOSITIVO (PC / CELULAR) -->
         <div id="view-files" class="view-section grid-files">
-            <!-- Coluna 1: Importar / Baixar do PC ou Celular -->
             <div class="panel">
                 <div class="panel-title">Importar Pastas e Arquivos (PC / Celular)</div>
                 <div class="drop-zone" onclick="document.getElementById('fileInputHidden').click()">
@@ -446,15 +436,10 @@
                     <button onclick="document.getElementById('fileSingleHidden').click()" style="flex: 1; padding: 8px;">Selecionar Arquivos</button>
                     <button onclick="document.getElementById('fileInputHidden').click()" style="flex: 1; padding: 8px;">Selecionar Pasta Inteira</button>
                 </div>
-
-                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 10px;">
-                    * Arquivos carregados são processados localmente no buffer seguro do J.A.R.V.I.S. para uso imediato.
-                </div>
             </div>
 
-            <!-- Coluna 2: Gerenciador e Download de Arquivos Sincronizados -->
             <div class="panel">
-                <div class="panel-title">Buffer de Arquivos Sincronizados no Sistema</div>
+                <div class="panel-title">Buffer de Arquivos Sincronizados</div>
                 <div class="file-list" id="fileListContainer">
                     <div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; margin-top: 40px;">
                         Nenhum arquivo ou pasta importado no momento.
@@ -487,7 +472,7 @@
             }
         }
 
-        // Memória e Mensagens Sincronizadas
+        // Sincronização de Chat e Memória
         const mainChatBox = document.getElementById('mainChatBox');
         const expandedChatBox = document.getElementById('expandedChatBox');
         const mainPromptInput = document.getElementById('mainPromptInput');
@@ -500,7 +485,7 @@
         function loadChatHistory() {
             const history = JSON.parse(localStorage.getItem('jarvis_chat_history') || '[]');
             if (history.length === 0) {
-                appendMessage('jarvis', 'Sistemas operacionais online, senhor. Como posso auxiliar?', false);
+                appendMessage('jarvis', 'Sistemas online, senhor. Estou em modo de espera e só responderei quando for acionado.', false);
             } else {
                 history.forEach(msg => appendMessage(msg.sender, msg.text, false));
             }
@@ -513,14 +498,12 @@
         }
 
         function appendMessage(sender, text, save = true) {
-            // Adiciona na tela principal
             const d1 = document.createElement('div');
             d1.className = `message ${sender}`;
             d1.innerText = text;
             mainChatBox.appendChild(d1);
             mainChatBox.scrollTop = mainChatBox.scrollHeight;
 
-            // Adiciona na aba de chat expandido
             const d2 = document.createElement('div');
             d2.className = `message ${sender}`;
             d2.innerText = text;
@@ -537,12 +520,12 @@
         }
 
         clearMemoryBtn.addEventListener('click', () => {
-            if(confirm("Deseja apagar todo o registro de memória, senhor?")) {
+            if(confirm("Deseja limpar todo o histórico de conversas, senhor?")) {
                 localStorage.removeItem('jarvis_chat_history');
                 mainChatBox.innerHTML = '';
                 expandedChatBox.innerHTML = '';
-                appendMessage('jarvis', 'Memória redefinida com sucesso, senhor.');
-                speakRobotVoice("Memória redefinida, senhor.");
+                appendMessage('jarvis', 'Memória redefinida, senhor.');
+                speakRobotVoice("Memória redefinida.");
             }
         });
 
@@ -551,15 +534,15 @@
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
-            utterance.rate = 1.05;
-            utterance.pitch = 0.55;
+            utterance.rate = 1.02;
+            utterance.pitch = 0.6;
             const voices = window.speechSynthesis.getVoices();
             const ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.includes('Daniel') || v.name.includes('Google') || v.name.includes('Male')));
             if (ptVoice) utterance.voice = ptVoice;
             window.speechSynthesis.speak(utterance);
         }
 
-        // Comunicação com o Backend /api/jarvis
+        // Comunicação com o Backend /api/jarvis (Responde apenas quando acionado)
         async function processJarvisCommand(textInput) {
             const text = textInput.trim();
             if (!text) return;
@@ -567,7 +550,7 @@
             appendMessage('user', text);
             mainPromptInput.value = '';
             expandedPromptInput.value = '';
-            jarvisStatusText.innerText = 'Processando...';
+            jarvisStatusText.innerText = 'Processando resposta...';
 
             try {
                 const response = await fetch('/api/jarvis', {
@@ -580,7 +563,7 @@
 
                 if (response.ok && data.response) {
                     appendMessage('jarvis', data.response);
-                    jarvisStatusText.innerText = 'Engine 3D Operacional';
+                    jarvisStatusText.innerText = 'Em espera (Aguardando comando)';
                     speakRobotVoice(data.response);
                 } else {
                     const err = data.error || "Falha no núcleo, senhor.";
@@ -602,7 +585,22 @@
         expandedSendBtn.addEventListener('click', () => processJarvisCommand(expandedPromptInput.value));
         expandedPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(expandedPromptInput.value); });
 
-        // --- GERENCIADOR DE ARQUIVOS E PASTAS (PC / CELULAR) ---
+        // --- VÍDEOS DE DANÇA DO YOUTUBE (Sincronizados com o Estilo Musical) ---
+        const danceVideos = {
+            synthwave: "4xDzrJKXOOY", // Exemplo de Synthwave / Dance Visual
+            pop: "9bZkp7q19f0",       // Exemplo de Pop Dance / Hit
+            club: "kJQP7kiw5Fk"       // Exemplo de Electronic / Club Dance
+        };
+
+        function setDanceVideo(style) {
+            const videoId = danceVideos[style] || danceVideos['synthwave'];
+            document.getElementById('danceVideoContainer').innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" allow="autoplay; encrypted-media"></iframe>
+            `;
+            jarvisStatusText.innerText = `Vídeo de Dança: ${style.toUpperCase()}`;
+        }
+
+        // --- GERENCIADOR DE ARQUIVOS (PC / CELULAR) ---
         let importedFiles = [];
         const fileInputHidden = document.getElementById('fileInputHidden');
         const fileSingleHidden = document.getElementById('fileSingleHidden');
@@ -618,7 +616,7 @@
                 });
             }
             renderFileList();
-            speakRobotVoice(`${files.length} arquivos importados com sucesso, senhor.`);
+            speakRobotVoice(`${files.length} itens importados com sucesso.`);
         }
 
         fileInputHidden.addEventListener('change', (e) => handleFileSelection(e.target.files));
@@ -664,105 +662,14 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
-            speakRobotVoice("Pacote de arquivos baixado para o seu dispositivo, senhor.");
+            speakRobotVoice("Pacote de arquivos baixado.");
         });
-
-        // --- RENDERIZADOR 3D (THREE.JS) ---
-        let scene, camera, renderer;
-        let head, torso, hips, leftArm, rightArm, leftLeg, rightLeg;
-        let danceMode = 'synthwave';
-        let clock = new THREE.Clock();
-
-        function init3D() {
-            const container = document.querySelector('.holo-projector-container');
-            if (!container) return;
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 1.2, 5.2);
-
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webglCanvas'), antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            scene.add(new THREE.AmbientLight(0x00f0ff, 0.8));
-            const pointLight = new THREE.PointLight(0x00f0ff, 2, 10);
-            pointLight.position.set(0, 2, 2);
-            scene.add(pointLight);
-
-            const holoMaterial = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x0088ff, emissiveIntensity: 0.6, wireframe: true });
-            const solidMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x0044aa, emissiveIntensity: 0.4 });
-
-            hips = new THREE.Group();
-            scene.add(hips);
-
-            torso = new THREE.Group();
-            torso.position.y = 0.6;
-            hips.add(torso);
-
-            const chest = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.18, 0.8, 12), holoMaterial);
-            chest.position.y = 0.1;
-            torso.add(chest);
-
-            head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), solidMat);
-            head.position.y = 0.7;
-            torso.add(head);
-
-            leftArm = new THREE.Group();
-            leftArm.position.set(-0.38, 0.45, 0);
-            leftArm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.7, 8), solidMat)).position.y = -0.3;
-            torso.add(leftArm);
-
-            rightArm = new THREE.Group();
-            rightArm.position.set(0.38, 0.45, 0);
-            rightArm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.7, 8), solidMat)).position.y = -0.3;
-            torso.add(rightArm);
-
-            leftLeg = new THREE.Group();
-            leftLeg.position.set(-0.18, -0.2, 0);
-            leftLeg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.07, 1.1, 8), solidMat)).position.y = -0.55;
-            hips.add(leftLeg);
-
-            rightLeg = new THREE.Group();
-            rightLeg.position.set(0.18, -0.2, 0);
-            rightLeg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.07, 1.1, 8), solidMat)).position.y = -0.55;
-            hips.add(rightLeg);
-
-            window.addEventListener('resize', () => {
-                if(!container) return;
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
-        }
-
-        function setDanceMode(mode) {
-            danceMode = mode;
-            jarvisStatusText.innerText = `Modo: ${mode.toUpperCase()}`;
-            speakRobotVoice(`Modo 3D alterado para ${mode}, senhor.`);
-        }
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            const t = clock.getElapsedTime() * (danceMode === 'club' ? 4.5 : danceMode === 'sensual' ? 2.2 : 3.2);
-
-            if (hips && torso && leftArm && rightArm && leftLeg && rightLeg) {
-                hips.rotation.y = Math.sin(t) * 0.4;
-                hips.position.x = Math.sin(t * 2) * 0.15;
-                torso.rotation.z = Math.sin(t) * 0.15;
-                leftArm.rotation.z = Math.sin(t * 1.5) * 0.6 + 0.5;
-                rightArm.rotation.z = -Math.sin(t * 1.5) * 0.6 - 0.5;
-                leftLeg.rotation.x = Math.sin(t) * 0.4;
-                rightLeg.rotation.x = -Math.sin(t) * 0.4;
-            }
-            if(renderer && scene && camera) renderer.render(scene, camera);
-        }
 
         // Player de Mídia
         const playlists = {
             cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
-            epic: [{title: "Stark Orchestral Suite", id: "2S24-y0Ij3Y"}],
-            relax: [{title: "Ambient Core Soundscapes", id: "5qap5aO4i9A"}]
+            pop: [{title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"}],
+            club: [{title: "Electronic Club Beats", id: "kJQP7kiw5Fk"}]
         };
         let currentFolder = 'cyber';
 
@@ -775,20 +682,20 @@
             currentFolder = e.target.value;
             const track = playlists[currentFolder][0];
             loadTrack(track.id, track.title);
+            setDanceVideo(currentFolder);
         });
 
         document.getElementById('nextBtn').addEventListener('click', () => {
             const track = playlists[currentFolder][0];
             loadTrack(track.id, track.title);
-            speakRobotVoice("Mídia atualizada, senhor.");
+            speakRobotVoice("Mídia atualizada.");
         });
 
         // Inicialização Geral
         window.addEventListener('load', () => {
             loadChatHistory();
-            init3D();
-            animate3D();
             loadTrack(playlists['cyber'][0].id, playlists['cyber'][0].title);
+            setDanceVideo('synthwave');
         });
     </script>
 </body>
