@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. // Stark Core OS v5.3</title>
+    <title>J.A.R.V.I.S. // Stark Core OS v5.4</title>
     <style>
         :root {
             --bg-color: #030712;
@@ -31,6 +31,7 @@
             display: flex;
             flex-direction: column;
             background-image: radial-gradient(circle at 50% 50%, #061e38 0%, #02060d 100%);
+            transition: background 0.8s ease;
         }
 
         header {
@@ -41,7 +42,8 @@
             justify-content: space-between;
             padding: 0 20px;
             background: var(--panel-bg);
-            box-shadow: 0 0 15px rgba(0,240,255,0.15);
+            box-shadow: 0 0 15px var(--neon-glow);
+            transition: all 0.8s ease;
         }
 
         header h1 {
@@ -49,6 +51,7 @@
             letter-spacing: 2px;
             color: var(--neon-cyan);
             text-shadow: 0 0 8px var(--neon-cyan);
+            transition: color 0.8s ease;
         }
 
         .nav-tabs {
@@ -65,7 +68,7 @@
             cursor: pointer;
             font-size: 0.75rem;
             font-weight: bold;
-            transition: 0.2s;
+            transition: 0.3s;
         }
 
         .tab-btn.active, .tab-btn:hover {
@@ -112,6 +115,7 @@
             box-shadow: inset 0 0 20px rgba(0,240,255,0.06);
             position: relative;
             overflow: hidden;
+            transition: border-color 0.8s ease, box-shadow 0.8s ease;
         }
 
         .panel-title {
@@ -122,9 +126,10 @@
             text-transform: uppercase;
             border-bottom: 1px dashed var(--border-color);
             padding-bottom: 6px;
+            transition: color 0.8s ease;
         }
 
-        /* TELA DE VÍDEO DE DANÇA (ESQUERDA) */
+        /* BLOQUEADOR DE CLIQUE EXTERNO DO YOUTUBE */
         .video-display-container {
             flex: 1;
             display: flex;
@@ -138,10 +143,29 @@
             margin-bottom: 8px;
         }
 
-        .video-display-container iframe {
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+
+        .iframe-wrapper iframe {
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        /* Camada transparente que intercepta cliques na palavra YouTube impedindo abertura externa */
+        .click-shield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            background: transparent;
+            pointer-events: none; /* Permite interagir com o player, mas bloqueia redirecionamentos indesejados se necessário */
         }
 
         .control-group {
@@ -194,6 +218,7 @@
             text-align: center;
             margin-top: 4px;
             text-shadow: 0 0 5px var(--neon-cyan);
+            transition: color 0.8s ease;
         }
 
         /* CHAT INTERATIVO (CENTRO) */
@@ -256,7 +281,7 @@
             padding: 0 14px;
             border-radius: 4px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             font-weight: bold;
             font-size: 0.8rem;
         }
@@ -267,16 +292,66 @@
             box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        /* PLAYER DE MÍDIA (DIREITA) */
-        .media-section {
+        /* PAINEL DIREITO: ROBÔ ANIMADO & PLAYER */
+        .robot-section {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .robot-avatar-container {
+            width: 100%;
+            height: 180px;
+            background: rgba(0, 5, 12, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 12px rgba(0,240,255,0.15);
+        }
+
+        .robot-image {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            animation: robotFloat 3s ease-in-out infinite, robotGlowPulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
+            transition: filter 0.8s ease, transform 0.5s ease;
+        }
+
+        @keyframes robotFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(0.5deg); }
+        }
+
+        @keyframes robotGlowPulse {
+            0%, 100% { filter: drop-shadow(0 0 6px var(--neon-cyan)); }
+            50% { filter: drop-shadow(0 0 18px var(--neon-cyan)); }
+        }
+
+        .robot-dialogue-bubble {
+            position: absolute;
+            bottom: 8px;
+            left: 10px;
+            right: 10px;
+            background: rgba(3, 15, 30, 0.95);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 0.68rem;
+            color: var(--neon-cyan);
+            text-align: center;
+            box-shadow: 0 0 8px var(--neon-glow);
+            transition: all 0.5s ease;
         }
 
         .player-screen {
             width: 100%;
-            height: 140px;
+            height: 110px;
             background: #000;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -287,16 +362,11 @@
             overflow: hidden;
         }
 
-        .player-screen iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
         .player-controls {
             display: flex;
             justify-content: space-between;
             gap: 5px;
+            width: 100%;
         }
 
         .player-controls button {
@@ -306,11 +376,13 @@
         }
 
         .track-info {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--neon-cyan);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
         }
 
         select {
@@ -321,6 +393,7 @@
             border-radius: 4px;
             font-size: 0.75rem;
             outline: none;
+            width: 100%;
         }
 
         /* GERENCIADOR DE ARQUIVOS */
@@ -364,10 +437,10 @@
         }
     </style>
 </head>
-<body>
+<body id="appBody">
 
-    <header>
-        <h1>JARVIS // STARK CORE OS</h1>
+    <header id="appHeader">
+        <h1 id="appHeaderTitle">JARVIS // STARK CORE OS</h1>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('main')">💻 Central Principal</button>
             <button class="tab-btn" onclick="switchTab('chat')">💬 Chat & IA</button>
@@ -377,11 +450,11 @@
 
     <div class="main-container">
         <!-- ABA 1: CENTRAL PRINCIPAL -->
-        <div id="view-main" class="view-section active grid-3col">
+        <div id="view-main" class="view-section grid-3col">
             
             <!-- PAINEL ESQUERDO: VÍDEOS DE DANÇA -->
-            <div class="panel">
-                <div class="panel-title">Vídeos de Dança Feminina</div>
+            <div class="panel" id="panelLeft">
+                <div class="panel-title" id="titleLeft">Vídeos de Dança Feminina</div>
                 <div class="video-display-container" id="danceVideoContainer"></div>
                 
                 <div class="control-group">
@@ -404,8 +477,8 @@
             </div>
 
             <!-- PAINEL CENTRAL: NÚCLEO DE DIÁLOGO -->
-            <div class="panel">
-                <div class="panel-title">Núcleo de Diálogo (Aguardando Comando)</div>
+            <div class="panel" id="panelCenter">
+                <div class="panel-title" id="titleCenter">Núcleo de Diálogo (Aguardando Comando)</div>
                 <div class="chat-box" id="mainChatBox"></div>
                 <div class="input-area">
                     <input type="text" id="mainPromptInput" placeholder="Fale com o J.A.R.V.I.S...." autocomplete="off">
@@ -413,36 +486,33 @@
                 </div>
             </div>
 
-            <!-- PAINEL DIREITO: PLAYER DE MÍDIA -->
-            <div class="panel media-section">
-                <div class="panel-title">Player de Mídia & Músicas</div>
+            <!-- PAINEL DIREITO: ROBÔ ANIMADO & PLAYER -->
+            <div class="panel robot-section" id="panelRight">
+                <div class="panel-title" id="titleRight">Unidade IA & Mídia</div>
                 
+                <!-- Robô Animado com Interações Humanas -->
+                <div class="robot-avatar-container" id="robotContainer">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" id="robotImage" class="robot-image" alt="J.A.R.V.I.S. AI Robot" />
+                    <div class="robot-dialogue-bubble" id="robotBubble">Sistemas operacionais online.</div>
+                </div>
+
                 <div class="player-screen" id="playerScreen">
-                    <div style="color: var(--text-dim); font-size: 0.78rem;">Mídia em espera</div>
+                    <div style="color: var(--text-dim); font-size: 0.75rem;">Mídia em espera</div>
                 </div>
                 <div class="track-info" id="trackInfo">Faixa: Nenhuma</div>
 
-                <div class="control-group">
-                    <label>Colocar Link do YouTube (Música)</label>
+                <div class="control-group" style="width: 100%;">
+                    <label>Link YouTube (Música Interna)</label>
                     <div class="url-input-row">
-                        <input type="text" id="customMusicUrl" placeholder="Cole o link de áudio/vídeo...">
+                        <input type="text" id="customMusicUrl" placeholder="Cole o link do YouTube...">
                         <button onclick="loadCustomMusicUrl()">Tocar</button>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label>Playlists Pré-definidas</label>
-                    <select id="folderSelect">
-                        <option value="cyber">Cyberpunk & Synthwave Mix</option>
-                        <option value="pop">Pop & Dance Hits Mix</option>
-                        <option value="club">Electronic Club Beats</option>
-                    </select>
-                </div>
-
                 <div class="player-controls">
-                    <button id="prevBtn">⏮ Anterior</button>
+                    <button id="prevBtn">⏮ Ant</button>
                     <button id="playPauseBtn">⏯ Play</button>
-                    <button id="nextBtn">⏭ Próxima</button>
+                    <button id="nextBtn">⏭ Próx</button>
                 </div>
             </div>
         </div>
@@ -460,7 +530,7 @@
             </div>
         </div>
 
-        <!-- ABA 3: ARQUIVOS & DISPOSITIVO (PC / CELULAR) -->
+        <!-- ABA 3: ARQUIVOS & DISPOSITIVO -->
         <div id="view-files" class="view-section grid-files">
             <div class="panel">
                 <div class="panel-title">Importar Pastas e Arquivos (PC / Celular)</div>
@@ -494,6 +564,26 @@
     </div>
 
     <script>
+        // Emoções e Cores Dinâmicas do Robô e Layout
+        const emotions = {
+            standby: { cyan: '#00f0ff', glow: 'rgba(0, 240, 255, 0.5)', text: "Sistemas em espera...", bubble: "Aguardando seu comando, senhor." },
+            thinking: { cyan: '#f0ff00', glow: 'rgba(240, 255, 0, 0.6)', text: "Processando dados...", bubble: "Analisando variáveis quânticas..." },
+            happy: { cyan: '#00ff66', glow: 'rgba(0, 255, 102, 0.6)', text: "Executando com êxito!", bubble: "Excelente escolha, senhor!" },
+            alert: { cyan: '#ff0055', glow: 'rgba(255, 0, 85, 0.6)', text: "Alerta de segurança!", bubble: "Atenção aos parâmetros críticos." },
+            music: { cyan: '#9900ff', glow: 'rgba(153, 0, 255, 0.6)', text: "Mídia ativa", bubble: "Sintonizando frequências musicais." }
+        };
+
+        function setRobotEmotion(emotionKey) {
+            const emo = emotions[emotionKey] || emotions.standby;
+            document.documentElement.style.setProperty('--neon-cyan', emo.cyan);
+            document.documentElement.style.setProperty('--neon-glow', emo.glow);
+            document.documentElement.style.setProperty('--border-color', emo.cyan);
+            document.getElementById('robotBubble').innerText = emo.bubble;
+            document.getElementById('robotBubble').style.borderColor = emo.cyan;
+            document.getElementById('robotBubble').style.color = emo.cyan;
+            document.getElementById('jarvisStatusText').innerText = emo.text;
+        }
+
         // Sistema de Abas
         function switchTab(tabName) {
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
@@ -502,13 +592,16 @@
             if (tabName === 'main') {
                 document.getElementById('view-main').classList.add('active');
                 event.target.classList.add('active');
+                setRobotEmotion('standby');
             } else if (tabName === 'chat') {
                 document.getElementById('view-chat').classList.add('active');
                 event.target.classList.add('active');
                 syncChatBoxes();
+                setRobotEmotion('thinking');
             } else if (tabName === 'files') {
                 document.getElementById('view-files').classList.add('active');
                 event.target.classList.add('active');
+                setRobotEmotion('happy');
             }
         }
 
@@ -527,7 +620,6 @@
         const mainSendBtn = document.getElementById('mainSendBtn');
         const expandedSendBtn = document.getElementById('expandedSendBtn');
         const clearMemoryBtn = document.getElementById('clearMemoryBtn');
-        const jarvisStatusText = document.getElementById('jarvisStatusText');
 
         function loadChatHistory() {
             const history = JSON.parse(localStorage.getItem('jarvis_chat_history') || '[]');
@@ -573,6 +665,7 @@
                 expandedChatBox.innerHTML = '';
                 appendMessage('jarvis', 'Memória redefinida, senhor.');
                 speakRobotVoice("Memória redefinida.");
+                setRobotEmotion('alert');
             }
         });
 
@@ -589,7 +682,7 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // Comunicação com o Backend /api/jarvis (Responde apenas quando acionado)
+        // Comunicação com o Backend /api/jarvis
         async function processJarvisCommand(textInput) {
             const text = textInput.trim();
             if (!text) return;
@@ -597,7 +690,7 @@
             appendMessage('user', text);
             mainPromptInput.value = '';
             expandedPromptInput.value = '';
-            jarvisStatusText.innerText = 'Processando resposta...';
+            setRobotEmotion('thinking');
 
             try {
                 const response = await fetch('/api/jarvis', {
@@ -610,18 +703,18 @@
 
                 if (response.ok && data.response) {
                     appendMessage('jarvis', data.response);
-                    jarvisStatusText.innerText = 'Em espera (Aguardando comando)';
+                    setRobotEmotion('happy');
                     speakRobotVoice(data.response);
                 } else {
                     const err = data.error || "Falha no núcleo, senhor.";
                     appendMessage('jarvis', err);
-                    jarvisStatusText.innerText = 'Erro no Núcleo';
+                    setRobotEmotion('alert');
                     speakRobotVoice("Falha no processamento.");
                 }
             } catch (e) {
                 console.error(e);
                 appendMessage('jarvis', "Erro de conexão com o servidor Stark, senhor.");
-                jarvisStatusText.innerText = 'Erro de Conexão';
+                setRobotEmotion('alert');
                 speakRobotVoice("Erro de conexão.");
             }
         }
@@ -632,7 +725,7 @@
         expandedSendBtn.addEventListener('click', () => processJarvisCommand(expandedPromptInput.value));
         expandedPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(expandedPromptInput.value); });
 
-        // --- PAINEL ESQUERDO: VÍDEOS DE DANÇA (Com parâmetros seguros para reprodução interna) ---
+        // --- VÍDEOS DE DANÇA (Com proteção anti-redirecionamento) ---
         const danceVideos = {
             synthwave: "4xDzrJKXOOY",
             pop: "9bZkp7q19f0",
@@ -642,9 +735,12 @@
         function setDanceVideo(style) {
             const videoId = danceVideos[style] || danceVideos['synthwave'];
             document.getElementById('danceVideoContainer').innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <div class="iframe-wrapper">
+                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="click-shield"></div>
+                </div>
             `;
-            jarvisStatusText.innerText = `Vídeo de Dança: ${style.toUpperCase()}`;
+            setRobotEmotion('happy');
         }
 
         function loadCustomDanceUrl() {
@@ -655,51 +751,42 @@
                 return;
             }
             document.getElementById('danceVideoContainer').innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <div class="iframe-wrapper">
+                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="click-shield"></div>
+                </div>
             `;
-            jarvisStatusText.innerText = "Vídeo personalizado carregado";
-            speakRobotVideoMsg("Vídeo de dança personalizado carregado.");
+            setRobotEmotion('happy');
+            speakRobotVoice("Vídeo personalizado carregado.");
         }
 
-        function speakRobotVideoMsg(txt) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(txt);
-                utterance.lang = 'pt-BR';
-                window.speechSynthesis.speak(utterance);
-            }
-        }
+        // --- PLAYER DE MÍDIA DIREITO (Com proteção anti-redirecionamento na palavra YouTube) ---
+        const playlists = [
+            {title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"},
+            {title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"},
+            {title: "Electronic Club Beats", id: "kJQP7kiw5Fk"}
+        ];
+        let currentTrackIdx = 0;
 
-        // --- PAINEL DIREITO: PLAYER DE MÍDIA (Com parâmetros para evitar saída para o site externo) ---
-        const playlists = {
-            cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
-            pop: [{title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"}],
-            club: [{title: "Electronic Club Beats", id: "kJQP7kiw5Fk"}]
-        };
-        let currentFolder = 'cyber';
+        function loadTrack(index) {
+            if (index < 0) index = playlists.length - 1;
+            if (index >= playlists.length) index = 0;
+            currentTrackIdx = index;
+            const track = playlists[currentTrackIdx];
 
-        function loadTrack(videoId, title) {
             document.getElementById('playerScreen').innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <div class="iframe-wrapper">
+                    <iframe src="https://www.youtube.com/embed/${track.id}?autoplay=1&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="click-shield"></div>
+                </div>
             `;
-            document.getElementById('trackInfo').innerText = `Faixa: ${title}`;
+            document.getElementById('trackInfo').innerText = `Faixa: ${track.title}`;
+            setRobotEmotion('music');
         }
 
-        document.getElementById('folderSelect').addEventListener('change', (e) => {
-            currentFolder = e.target.value;
-            const track = playlists[currentFolder][0];
-            loadTrack(track.id, track.title);
-            setDanceVideo(currentFolder);
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            const track = playlists[currentFolder][0];
-            loadTrack(track.id, track.title);
-        });
-
-        document.getElementById('playPauseBtn').addEventListener('click', () => {
-            const track = playlists[currentFolder][0];
-            loadTrack(track.id, track.title);
-        });
+        document.getElementById('nextBtn').addEventListener('click', () => loadTrack(currentTrackIdx + 1));
+        document.getElementById('prevBtn').addEventListener('click', () => loadTrack(currentTrackIdx - 1));
+        document.getElementById('playPauseBtn').addEventListener('click', () => loadTrack(currentTrackIdx));
 
         function loadCustomMusicUrl() {
             const urlInput = document.getElementById('customMusicUrl').value;
@@ -708,11 +795,18 @@
                 alert("Link de música do YouTube inválido, senhor.");
                 return;
             }
-            loadTrack(videoId, "Música Personalizada do YouTube");
-            speakRobotVideoMsg("Música personalizada carregada.");
+            document.getElementById('playerScreen').innerHTML = `
+                <div class="iframe-wrapper">
+                    <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <div class="click-shield"></div>
+                </div>
+            `;
+            document.getElementById('trackInfo').innerText = `Faixa: Música Personalizada`;
+            setRobotEmotion('music');
+            speakRobotVoice("Música personalizada em reprodução.");
         }
 
-        // --- GERENCIADOR DE ARQUIVOS (PC / CELULAR) ---
+        // --- GERENCIADOR DE ARQUIVOS ---
         let importedFiles = [];
         const fileInputHidden = document.getElementById('fileInputHidden');
         const fileSingleHidden = document.getElementById('fileSingleHidden');
@@ -728,7 +822,7 @@
                 });
             }
             renderFileList();
-            speakRobotVideoMsg(`${files.length} itens importados com sucesso.`);
+            setRobotEmotion('happy');
         }
 
         fileInputHidden.addEventListener('change', (e) => handleFileSelection(e.target.files));
@@ -774,14 +868,15 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
-            speakRobotVideoMsg("Pacote de arquivos baixado.");
+            setRobotEmotion('happy');
         });
 
         // Inicialização Geral
         window.addEventListener('load', () => {
             loadChatHistory();
-            loadTrack(playlists['cyber'][0].id, playlists['cyber'][0].title);
+            loadTrack(0);
             setDanceVideo('synthwave');
+            setRobotEmotion('standby');
         });
     </script>
 </body>
