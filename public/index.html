@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. // Stark Core OS v5.2</title>
+    <title>J.A.R.V.I.S. // Stark Core OS v5.3</title>
     <style>
         :root {
             --bg-color: #030712;
@@ -379,7 +379,7 @@
         <!-- ABA 1: CENTRAL PRINCIPAL -->
         <div id="view-main" class="view-section active grid-3col">
             
-            <!-- PAINEL ESQUERDO: VÍDEOS DE DANÇA (Com link customizado do YouTube) -->
+            <!-- PAINEL ESQUERDO: VÍDEOS DE DANÇA -->
             <div class="panel">
                 <div class="panel-title">Vídeos de Dança Feminina</div>
                 <div class="video-display-container" id="danceVideoContainer"></div>
@@ -403,7 +403,7 @@
                 <div class="jarvis-status-text" id="jarvisStatusText">Modo de Dança Ativo</div>
             </div>
 
-            <!-- PAINEL CENTRAL: NÚCLEO DE DIÁLOGO (Responde apenas quando acionado) -->
+            <!-- PAINEL CENTRAL: NÚCLEO DE DIÁLOGO -->
             <div class="panel">
                 <div class="panel-title">Núcleo de Diálogo (Aguardando Comando)</div>
                 <div class="chat-box" id="mainChatBox"></div>
@@ -413,7 +413,7 @@
                 </div>
             </div>
 
-            <!-- PAINEL DIREITO: PLAYER DE MÍDIA (Com link customizado para músicas) -->
+            <!-- PAINEL DIREITO: PLAYER DE MÍDIA -->
             <div class="panel media-section">
                 <div class="panel-title">Player de Mídia & Músicas</div>
                 
@@ -632,7 +632,7 @@
         expandedSendBtn.addEventListener('click', () => processJarvisCommand(expandedPromptInput.value));
         expandedPromptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processJarvisCommand(expandedPromptInput.value); });
 
-        // --- PAINEL ESQUERDO: VÍDEOS DE DANÇA ---
+        // --- PAINEL ESQUERDO: VÍDEOS DE DANÇA (Com parâmetros seguros para reprodução interna) ---
         const danceVideos = {
             synthwave: "4xDzrJKXOOY",
             pop: "9bZkp7q19f0",
@@ -642,7 +642,7 @@
         function setDanceVideo(style) {
             const videoId = danceVideos[style] || danceVideos['synthwave'];
             document.getElementById('danceVideoContainer').innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" allow="autoplay; encrypted-media"></iframe>
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             `;
             jarvisStatusText.innerText = `Vídeo de Dança: ${style.toUpperCase()}`;
         }
@@ -655,7 +655,7 @@
                 return;
             }
             document.getElementById('danceVideoContainer').innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}" allow="autoplay; encrypted-media"></iframe>
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             `;
             jarvisStatusText.innerText = "Vídeo personalizado carregado";
             speakRobotVideoMsg("Vídeo de dança personalizado carregado.");
@@ -669,7 +669,7 @@
             }
         }
 
-        // --- PAINEL DIREITO: PLAYER DE MÍDIA ---
+        // --- PAINEL DIREITO: PLAYER DE MÍDIA (Com parâmetros para evitar saída para o site externo) ---
         const playlists = {
             cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}],
             pop: [{title: "Pop Dance Hits Mix", id: "9bZkp7q19f0"}],
@@ -678,7 +678,9 @@
         let currentFolder = 'cyber';
 
         function loadTrack(videoId, title) {
-            document.getElementById('playerScreen').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay"></iframe>`;
+            document.getElementById('playerScreen').innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            `;
             document.getElementById('trackInfo').innerText = `Faixa: ${title}`;
         }
 
