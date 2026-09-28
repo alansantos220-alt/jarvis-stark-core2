@@ -9,6 +9,7 @@
             --bg-color: #030712;
             --panel-bg: rgba(3, 15, 30, 0.9);
             --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
             --neon-glow: rgba(0, 240, 255, 0.5);
             --border-color: rgba(0, 240, 255, 0.35);
             --text-main: #e0f7fc;
@@ -52,7 +53,7 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: 340px 1fr 380px;
+            grid-template-columns: 360px 1fr 380px;
             flex: 1;
             gap: 15px;
             padding: 15px;
@@ -80,7 +81,7 @@
             padding-bottom: 6px;
         }
 
-        /* HOLOGRAPHIC JARVIS PROJECTOR (LEFT) */
+        /* PAINEL ESQUERDO: HOLOGRAFIA DA MULHER DANÇANDO (CANVAS) */
         .holo-projector-container {
             flex: 1;
             display: flex;
@@ -88,81 +89,39 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, transparent 75%);
-            border-radius: 10px;
+            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, #02060d 80%);
+            border-radius: 8px;
             margin: 5px 0;
             border: 1px solid var(--border-color);
-            box-shadow: inset 0 0 30px rgba(0,240,255,0.1);
             overflow: hidden;
             min-height: 280px;
         }
 
-        .hologram-beam {
-            position: absolute;
-            bottom: 0;
-            width: 80px;
+        #dancerCanvas {
+            width: 100%;
             height: 100%;
-            background: linear-gradient(to top, rgba(0,240,255,0.4), transparent);
-            clip-path: polygon(30% 100%, 70% 100%, 100% 0%, 0% 0%);
-            animation: beamPulse 3s infinite alternate ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
-        @keyframes beamPulse {
-            0% { opacity: 0.4; transform: scaleX(0.95); }
-            100% { opacity: 0.8; transform: scaleX(1.05); }
-        }
-
-        .jarvis-bust {
-            position: relative;
-            z-index: 2;
+        .holo-controls {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.4s ease;
-        }
-
-        .jarvis-helmet {
-            font-size: 3.5rem;
-            filter: drop-shadow(0 0 12px var(--neon-cyan));
-            animation: helmetFloat 2.5s infinite alternate ease-in-out;
-        }
-
-        @keyframes helmetFloat {
-            0% { transform: translateY(0px) rotate(0deg); }
-            100% { transform: translateY(-6px) rotate(1deg); }
-        }
-
-        .arc-reactor-core {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid var(--neon-cyan);
-            background: radial-gradient(circle, #fff 0%, var(--neon-cyan) 50%, #002244 100%);
-            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 8px #fff;
+            gap: 5px;
             margin-top: 8px;
-            animation: reactorPulse 1.2s infinite alternate;
-        }
-
-        @keyframes reactorPulse {
-            0% { box-shadow: 0 0 10px var(--neon-cyan); transform: scale(0.95); }
-            100% { box-shadow: 0 0 25px #fff, 0 0 15px var(--neon-cyan); transform: scale(1.05); }
-        }
-
-        .holo-base-emitter {
-            width: 140px;
-            height: 25px;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 50%;
-            margin-top: 15px;
-            background: rgba(0,240,255,0.2);
-            box-shadow: 0 0 15px var(--neon-cyan);
+            justify-content: center;
             z-index: 2;
+        }
+
+        .holo-controls button {
+            font-size: 0.65rem;
+            padding: 4px 8px;
         }
 
         .jarvis-status-text {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--neon-cyan);
-            margin-top: 10px;
+            margin-top: 6px;
             text-align: center;
             z-index: 2;
             text-shadow: 0 0 5px var(--neon-cyan);
@@ -245,7 +204,7 @@
             box-shadow: 0 0 12px #ff3333;
         }
 
-        /* MEDIA & DANCING 2D CHARACTER (RIGHT) */
+        /* MEDIA & PLAYER (RIGHT) */
         .media-section {
             display: flex;
             flex-direction: column;
@@ -275,7 +234,7 @@
 
         .player-screen {
             width: 100%;
-            height: 120px;
+            height: 160px;
             background: #000;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -300,112 +259,39 @@
 
         .player-controls button {
             flex: 1;
-            padding: 6px 0;
-            font-size: 0.7rem;
+            padding: 7px 0;
+            font-size: 0.72rem;
         }
 
         .track-info {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             color: var(--neon-cyan);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        /* 2D DANCING CHARACTER PALACE (BELOW PLAYER) */
-        .dancer-container {
-            flex: 1;
-            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, rgba(2,6,13,0.95) 80%);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            min-height: 160px;
-        }
-
-        .dancer-image-wrapper {
-            width: 90px;
-            height: 120px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s ease;
-        }
-
-        .dancer-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
-            border-radius: 4px;
-        }
-
-        /* Animações de Dança por Estilo Musical */
-        .dancer-image-wrapper.cyber-dance {
-            animation: danceCyber 0.8s infinite alternate ease-in-out;
-        }
-
-        .dancer-image-wrapper.epic-dance {
-            animation: danceEpic 1.2s infinite alternate ease-in-out;
-        }
-
-        .dancer-image-wrapper.relax-dance {
-            animation: danceRelax 2.0s infinite alternate ease-in-out;
-        }
-
-        @keyframes danceCyber {
-            0% { transform: translateY(0px) scale(1) rotate(-5deg); filter: drop-shadow(0 0 10px #00f0ff); }
-            50% { transform: translateY(-10px) scale(1.08) rotate(5deg); filter: drop-shadow(0 0 20px #ff00ff); }
-            100% { transform: translateY(0px) scale(1) rotate(-5deg); filter: drop-shadow(0 0 10px #00f0ff); }
-        }
-
-        @keyframes danceEpic {
-            0% { transform: translateY(0px) scale(1) scaleX(1); filter: drop-shadow(0 0 12px #gold); }
-            50% { transform: translateY(-15px) scale(1.12) scaleX(0.98); filter: drop-shadow(0 0 25px #00f0ff); }
-            100% { transform: translateY(0px) scale(1) scaleX(1); filter: drop-shadow(0 0 12px #gold); }
-        }
-
-        @keyframes danceRelax {
-            0% { transform: translateY(0px) rotate(-2deg); filter: drop-shadow(0 0 8px #00f0ff); }
-            100% { transform: translateY(-5px) rotate(2deg); filter: drop-shadow(0 0 15px #00f0ff); }
-        }
-
-        .dancer-status {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            margin-top: 6px;
-            background: rgba(0,240,255,0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>JARVIS // STARK CORE v4.1</h1>
+        <h1>JARVIS // STARK CORE v4.2</h1>
         <div style="font-size: 0.75rem; color: var(--neon-cyan);">ESTADO: OPERACIONAL</div>
     </header>
 
     <div class="main-grid">
-        <!-- PAINEL ESQUERDO: PROJEÇÃO HOLOGRÁFICA DO J.A.R.V.I.S. -->
+        <!-- PAINEL ESQUERDO: HOLOGRAFIA DA MULHER DANÇANDO -->
         <div class="panel">
-            <div class="panel-title">Projeção Holográfica // J.A.R.V.I.S.</div>
+            <div class="panel-title">Holograma 3D // Dançarina Sensual</div>
             <div class="holo-projector-container">
-                <div class="hologram-beam"></div>
-                <div class="jarvis-bust" id="jarvisBust">
-                    <div class="jarvis-helmet" id="jarvisHelmet">🤖</div>
-                    <div class="arc-reactor-core" id="arcReactor"></div>
-                </div>
-                <div class="holo-base-emitter"></div>
+                <canvas id="dancerCanvas"></canvas>
             </div>
-            <div class="jarvis-status-text" id="jarvisStatusText">Núcleo Stark Ativo</div>
+            <div class="jarvis-status-text" id="jarvisStatusText">Coreógrafo Holográfico Ativo</div>
+            <div class="holo-controls">
+                <button onclick="setDanceMode('synthwave')">⚡ Synthwave</button>
+                <button onclick="setDanceMode('sensual')">✨ Sensual Wave</button>
+                <button onclick="setDanceMode('club')">🔥 Club Beat</button>
+            </div>
             <div style="margin-top: 8px; text-align: center;">
                 <button id="clearMemoryBtn" style="font-size: 0.7rem; padding: 4px 10px;">Limpar Memória</button>
             </div>
@@ -422,9 +308,9 @@
             </div>
         </div>
 
-        <!-- PAINEL DIREITO: MULTIMÍDIA & BONECA 2D DANÇANDO -->
+        <!-- PAINEL DIREITO: MULTIMÍDIA -->
         <div class="panel media-section">
-            <div class="panel-title">Controle de Mídia & Dança 2D</div>
+            <div class="panel-title">Controle de Mídia & Playlists</div>
             
             <div class="folder-select">
                 <label>Pasta / Playlist Atual</label>
@@ -456,15 +342,6 @@
                 <button id="playPauseBtn">⏯ Play/Pause</button>
                 <button id="nextBtn">⏭ Avançar</button>
             </div>
-
-            <!-- BONECA 2D DA IMAGEM ABAIXO DO PLAYER -->
-            <div class="dancer-container">
-                <div class="dancer-image-wrapper cyber-dance" id="dancerWrapper">
-                    <!-- Utilizando a imagem 2D enviada pelo senhor -->
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Dançarina 2D" class="dancer-img" id="dancerImg">
-                </div>
-                <div class="dancer-status" id="dancerStatus">Dançando: Cyberpunk Groove 🎶</div>
-            </div>
         </div>
     </div>
 
@@ -474,10 +351,6 @@
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
         const clearMemoryBtn = document.getElementById('clearMemoryBtn');
-        
-        const jarvisBust = document.getElementById('jarvisBust');
-        const jarvisHelmet = document.getElementById('jarvisHelmet');
-        const arcReactor = document.getElementById('arcReactor');
         const jarvisStatusText = document.getElementById('jarvisStatusText');
 
         const folderSelect = document.getElementById('folderSelect');
@@ -487,9 +360,6 @@
         const trackInfo = document.getElementById('trackInfo');
         const nextBtn = document.getElementById('nextBtn');
         const prevBtn = document.getElementById('prevBtn');
-        const dancerWrapper = document.getElementById('dancerWrapper');
-        const dancerStatus = document.getElementById('dancerStatus');
-        const dancerImg = document.getElementById('dancerImg');
 
         // Playlists
         const playlists = {
@@ -501,7 +371,7 @@
         let currentFolder = 'cyber';
         let currentIndex = 0;
 
-        // Histórico de Conversa (LocalStorage Ilimitado)
+        // Histórico de Conversa (LocalStorage)
         function loadChatHistory() {
             const history = JSON.parse(localStorage.getItem('jarvis_chat_history') || '[]');
             if (history.length === 0) {
@@ -551,45 +421,128 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        function setJarvisReaction(state, textStatus) {
-            jarvisStatusText.innerText = textStatus;
-            arcReactor.style.animation = '';
-            jarvisBust.style.transform = 'translateY(0px)';
-            void arcReactor.offsetWidth;
+        // CANVAS HOLOGRÁFICO DA DANÇARINA SENSUAL DETALHADA
+        const canvas = document.getElementById('dancerCanvas');
+        const ctx = canvas.getContext('2d');
+        let danceMode = 'synthwave';
+        let animAngle = 0;
 
-            if (state === 'thinking') {
-                arcReactor.style.animation = 'reactorPulse 0.4s infinite alternate';
-                jarvisBust.style.transform = 'scale(1.05)';
-                jarvisHelmet.innerText = '🤔';
-            } else if (state === 'talking') {
-                arcReactor.style.animation = 'reactorPulse 0.8s infinite alternate';
-                jarvisHelmet.innerText = '🗣️';
-            } else if (state === 'listening') {
-                arcReactor.style.animation = 'reactorPulse 0.6s infinite alternate';
-                jarvisHelmet.innerText = '🎙️';
-            } else {
-                arcReactor.style.animation = 'reactorPulse 1.2s infinite alternate';
-                jarvisHelmet.innerText = '🤖';
-            }
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight - 40;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function setDanceMode(mode) {
+            danceMode = mode;
+            jarvisStatusText.innerText = `Modo Ativo: ${mode.toUpperCase()}`;
+            speakRobotVoice(`Modo de dança alterado para ${mode}, senhor.`);
         }
 
-        // Carregar Mídia e Sincronizar Dança da Personagem 2D
+        function drawHolographicDancer() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2 + 20;
+
+            animAngle += (danceMode === 'club' ? 0.08 : danceMode === 'sensual' ? 0.04 : 0.06);
+
+            // Efeito de grade holográfica de fundo
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.height; i += 15) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Parâmetros de ondulação corporal baseados na música
+            const hipSway = Math.sin(animAngle * 2) * 12;
+            const torsoTwist = Math.cos(animAngle) * 8;
+            const armWave = Math.sin(animAngle * 1.5) * 20;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Brilho Néon Holográfico
+            ctx.shadowColor = danceMode === 'sensual' ? '#ff007f' : '#00f0ff';
+            ctx.shadowBlur = 15;
+            ctx.strokeStyle = danceMode === 'sensual' ? '#ff007f' : '#00f0ff';
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.15)';
+            ctx.lineWidth = 2.5;
+
+            // 1. Cabeça com Cabelos Esvoaçantes
+            ctx.beginPath();
+            ctx.arc(torsoTwist * 0.5, -75, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Cabelos longos flutuando
+            ctx.beginPath();
+            ctx.moveTo(torsoTwist * 0.5 - 10, -85);
+            ctx.quadraticCurveTo(torsoTwist - 35, -50, torsoTwist - 20 + hipSway * 0.5, -20);
+            ctx.stroke();
+
+            // 2. Tronco & Busto (Curvas Orgânicas Sensuais)
+            ctx.beginPath();
+            ctx.moveTo(-12, -55);
+            ctx.quadraticCurveTo(-15 + torsoTwist, -25, -16 + hipSway * 0.5, 0); // Lado esquerdo
+            ctx.lineTo(16 + hipSway * 0.5, 0); // Cintura / Quadris
+            ctx.quadraticCurveTo(15 + torsoTwist, -25, 12, -55); // Lado direito
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. Braços Dinâmicos
+            // Braço Esquerdo
+            ctx.beginPath();
+            ctx.moveTo(-12, -50);
+            ctx.quadraticCurveTo(-35 + armWave, -30, -20 + armWave * 0.8, -5);
+            ctx.stroke();
+
+            // Braço Direito
+            ctx.beginPath();
+            ctx.moveTo(12, -50);
+            ctx.quadraticCurveTo(35 - armWave, -30, 20 - armWave * 0.8, -5);
+            ctx.stroke();
+
+            // 4. Pernas com Rebolado Fluido
+            // Perna Esquerda
+            ctx.beginPath();
+            ctx.moveTo(-10 + hipSway * 0.5, 0);
+            ctx.quadraticCurveTo(-18 + hipSway, 40, -12 + hipSway * 1.2, 80);
+            ctx.stroke();
+
+            // Perna Direita
+            ctx.beginPath();
+            ctx.moveTo(10 + hipSway * 0.5, 0);
+            ctx.quadraticCurveTo(18 + hipSway, 40, 12 + hipSway * 1.2, 80);
+            ctx.stroke();
+
+            // Base do Emitidor Holográfico em Anel
+            ctx.restore();
+            ctx.strokeStyle = '#00f0ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 95, 60, 18, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
+            ctx.fill();
+
+            requestAnimationFrame(drawHolographicDancer);
+        }
+        drawHolographicDancer();
+
+        // Carregar Mídia & Sincronizar com Pastas
         function loadTrack(videoId, title) {
             playerScreen.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
             trackInfo.innerText = `Faixa: ${title}`;
             
-            // Ajusta o estilo de dança conforme a pasta/estilo musical
-            dancerWrapper.className = 'dancer-image-wrapper';
-            if (currentFolder === 'cyber') {
-                dancerWrapper.classList.add('cyber-dance');
-                dancerStatus.innerText = 'Dançando: Cyberpunk Groove ⚡';
-            } else if (currentFolder === 'epic') {
-                dancerWrapper.classList.add('epic-dance');
-                dancerStatus.innerText = 'Dançando: Ritmo Épico Intenso 🔥';
-            } else {
-                dancerWrapper.classList.add('relax-dance');
-                dancerStatus.innerText = 'Dançando: Foco & Atmosfera Suave 🍃';
-            }
+            if (currentFolder === 'cyber') setDanceMode('synthwave');
+            else if (currentFolder === 'epic') setDanceMode('club');
+            else setDanceMode('sensual');
         }
 
         folderSelect.addEventListener('change', (e) => {
@@ -643,7 +596,7 @@
             micBtn.addEventListener('click', () => {
                 recognition.start();
                 micBtn.classList.add('listening');
-                setJarvisReaction('listening', 'Ouvindo comando de voz...');
+                jarvisStatusText.innerText = 'Ouvindo comando de voz...';
             });
 
             recognition.onresult = (event) => {
@@ -655,7 +608,7 @@
 
             recognition.onerror = () => {
                 micBtn.classList.remove('listening');
-                setJarvisReaction('normal', 'Erro na captação de voz');
+                jarvisStatusText.innerText = 'Erro na captação de voz';
             };
 
             recognition.onend = () => {
@@ -665,14 +618,14 @@
             micBtn.style.display = 'none';
         }
 
-        // Comunicação com o Backend
+        // Comunicação com o Servidor /api/jarvis
         async function sendCommand() {
             const text = promptInput.value.trim();
             if (!text) return;
 
             appendMessage('user', text);
             promptInput.value = '';
-            setJarvisReaction('thinking', 'Processando requisição...');
+            jarvisStatusText.innerText = 'Processando requisição...';
 
             try {
                 const response = await fetch('/api/jarvis', {
@@ -685,20 +638,20 @@
 
                 if (response.ok && data.response) {
                     appendMessage('jarvis', data.response);
-                    setJarvisReaction('talking', 'Respondendo ao senhor');
+                    jarvisStatusText.innerText = 'Respondendo ao senhor';
                     speakRobotVoice(data.response);
-                    setTimeout(() => setJarvisReaction('normal', 'Núcleo Stark Ativo'), 4000);
+                    setTimeout(() => jarvisStatusText.innerText = 'Coreógrafo Holográfico Ativo', 4000);
                 } else {
                     const errText = data.error || "Ocorreu um erro no núcleo, senhor.";
                     appendMessage('jarvis', errText);
-                    setJarvisReaction('normal', 'Atenção Requerida');
+                    jarvisStatusText.innerText = 'Atenção Requerida';
                     speakRobotVoice("Houve uma falha no processamento, senhor.");
                 }
 
             } catch (err) {
                 console.error(err);
                 appendMessage('jarvis', "Falha de comunicação com o núcleo de inteligência, senhor.");
-                setJarvisReaction('normal', 'Erro de Conexão');
+                jarvisStatusText.innerText = 'Erro de Conexão';
                 speakRobotVoice("Falha de comunicação com o núcleo de inteligência, senhor.");
             }
         }
@@ -713,7 +666,6 @@
             loadChatHistory();
             const initialTrack = playlists['cyber'][0];
             loadTrack(initialTrack.id, initialTrack.title);
-            setJarvisReaction('normal', 'Núcleo Stark Operacional');
         });
     </script>
 </body>
