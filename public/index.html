@@ -121,7 +121,6 @@
             transition: transform 0.4s ease;
         }
 
-        /* Helmet Styling */
         .jarvis-helmet {
             font-size: 3.5rem;
             filter: drop-shadow(0 0 12px var(--neon-cyan));
@@ -133,7 +132,6 @@
             100% { transform: translateY(-6px) rotate(1deg); }
         }
 
-        /* Arc Reactor Chest Core */
         .arc-reactor-core {
             width: 45px;
             height: 45px;
@@ -277,7 +275,7 @@
 
         .player-screen {
             width: 100%;
-            height: 140px;
+            height: 120px;
             background: #000;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -302,22 +300,22 @@
 
         .player-controls button {
             flex: 1;
-            padding: 7px 0;
-            font-size: 0.72rem;
+            padding: 6px 0;
+            font-size: 0.7rem;
         }
 
         .track-info {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--neon-cyan);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* DANCING 2D CHARACTER CONTAINER (BELOW PLAYER) */
+        /* 2D DANCING CHARACTER PALACE (BELOW PLAYER) */
         .dancer-container {
             flex: 1;
-            background: radial-gradient(circle, rgba(0,240,255,0.08) 0%, rgba(2,6,13,0.9) 80%);
+            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, rgba(2,6,13,0.95) 80%);
             border: 1px solid var(--border-color);
             border-radius: 6px;
             display: flex;
@@ -326,41 +324,73 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            min-height: 140px;
+            min-height: 160px;
         }
 
-        .dancer-avatar {
-            font-size: 3.2rem;
+        .dancer-image-wrapper {
+            width: 90px;
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .dancer-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             filter: drop-shadow(0 0 10px var(--neon-cyan));
-            animation: danceIdle 1.5s infinite alternate ease-in-out;
+            border-radius: 4px;
         }
 
-        @keyframes danceIdle {
-            0% { transform: translateY(0px) rotate(-3deg); }
-            100% { transform: translateY(-8px) rotate(3deg); }
+        /* Animações de Dança por Estilo Musical */
+        .dancer-image-wrapper.cyber-dance {
+            animation: danceCyber 0.8s infinite alternate ease-in-out;
         }
 
-        @keyframes danceActive {
-            0% { transform: translateY(0px) scale(1) rotate(-8deg); filter: drop-shadow(0 0 15px #00f0ff); }
-            50% { transform: translateY(-12px) scale(1.1) rotate(8deg); filter: drop-shadow(0 0 25px #ff00ff); }
-            100% { transform: translateY(0px) scale(1) rotate(-8deg); filter: drop-shadow(0 0 15px #00f0ff); }
+        .dancer-image-wrapper.epic-dance {
+            animation: danceEpic 1.2s infinite alternate ease-in-out;
+        }
+
+        .dancer-image-wrapper.relax-dance {
+            animation: danceRelax 2.0s infinite alternate ease-in-out;
+        }
+
+        @keyframes danceCyber {
+            0% { transform: translateY(0px) scale(1) rotate(-5deg); filter: drop-shadow(0 0 10px #00f0ff); }
+            50% { transform: translateY(-10px) scale(1.08) rotate(5deg); filter: drop-shadow(0 0 20px #ff00ff); }
+            100% { transform: translateY(0px) scale(1) rotate(-5deg); filter: drop-shadow(0 0 10px #00f0ff); }
+        }
+
+        @keyframes danceEpic {
+            0% { transform: translateY(0px) scale(1) scaleX(1); filter: drop-shadow(0 0 12px #gold); }
+            50% { transform: translateY(-15px) scale(1.12) scaleX(0.98); filter: drop-shadow(0 0 25px #00f0ff); }
+            100% { transform: translateY(0px) scale(1) scaleX(1); filter: drop-shadow(0 0 12px #gold); }
+        }
+
+        @keyframes danceRelax {
+            0% { transform: translateY(0px) rotate(-2deg); filter: drop-shadow(0 0 8px #00f0ff); }
+            100% { transform: translateY(-5px) rotate(2deg); filter: drop-shadow(0 0 15px #00f0ff); }
         }
 
         .dancer-status {
             font-size: 0.7rem;
             color: var(--text-dim);
-            margin-top: 4px;
+            margin-top: 6px;
             background: rgba(0,240,255,0.1);
             padding: 2px 8px;
             border-radius: 4px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>JARVIS // STARK CORE v4.0</h1>
-        <div style="font-size: 0.75rem; color: var(--neon-cyan);">ESTADO: CONECTADO</div>
+        <h1>JARVIS // STARK CORE v4.1</h1>
+        <div style="font-size: 0.75rem; color: var(--neon-cyan);">ESTADO: OPERACIONAL</div>
     </header>
 
     <div class="main-grid">
@@ -375,7 +405,7 @@
                 </div>
                 <div class="holo-base-emitter"></div>
             </div>
-            <div class="jarvis-status-text" id="jarvisStatusText">Núcleo Stark Ativo - Aguardando Comando</div>
+            <div class="jarvis-status-text" id="jarvisStatusText">Núcleo Stark Ativo</div>
             <div style="margin-top: 8px; text-align: center;">
                 <button id="clearMemoryBtn" style="font-size: 0.7rem; padding: 4px 10px;">Limpar Memória</button>
             </div>
@@ -384,9 +414,7 @@
         <!-- PAINEL CENTRAL: NÚCLEO DE INTELIGÊNCIA & DIÁLOGO -->
         <div class="panel">
             <div class="panel-title">Núcleo de Inteligência & Memória Ilimitada</div>
-            <div class="chat-box" id="chatBox">
-                <!-- Histórico carregado via localStorage -->
-            </div>
+            <div class="chat-box" id="chatBox"></div>
             <div class="input-area">
                 <input type="text" id="promptInput" placeholder="Digite seu comando para o J.A.R.V.I.S...." autocomplete="off">
                 <button id="micBtn" class="mic-btn" title="Comando por Voz">🎙️ Falar</button>
@@ -396,14 +424,14 @@
 
         <!-- PAINEL DIREITO: MULTIMÍDIA & BONECA 2D DANÇANDO -->
         <div class="panel media-section">
-            <div class="panel-title">Controle de Mídia & Palco 2D</div>
+            <div class="panel-title">Controle de Mídia & Dança 2D</div>
             
             <div class="folder-select">
                 <label>Pasta / Playlist Atual</label>
                 <select id="folderSelect">
-                    <option value="cyber">Cyberpunk & Synthwave</option>
-                    <option value="epic">Trilhas Épicas Stark</option>
-                    <option value="relax">Foco & Concentração</option>
+                    <option value="cyber">Cyberpunk & Synthwave (Ritmo Ágil)</option>
+                    <option value="epic">Trilhas Épicas Stark (Ritmo Forte)</option>
+                    <option value="relax">Foco & Concentração (Ritmo Suave)</option>
                 </select>
             </div>
 
@@ -429,10 +457,13 @@
                 <button id="nextBtn">⏭ Avançar</button>
             </div>
 
-            <!-- BONECA 2D DANÇANDO ABAIXO DO PLAYER -->
+            <!-- BONECA 2D DA IMAGEM ABAIXO DO PLAYER -->
             <div class="dancer-container">
-                <div class="dancer-avatar" id="dancerAvatar">💃</div>
-                <div class="dancer-status" id="dancerStatus">Em Repouso</div>
+                <div class="dancer-image-wrapper cyber-dance" id="dancerWrapper">
+                    <!-- Utilizando a imagem 2D enviada pelo senhor -->
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="Dançarina 2D" class="dancer-img" id="dancerImg">
+                </div>
+                <div class="dancer-status" id="dancerStatus">Dançando: Cyberpunk Groove 🎶</div>
             </div>
         </div>
     </div>
@@ -449,7 +480,6 @@
         const arcReactor = document.getElementById('arcReactor');
         const jarvisStatusText = document.getElementById('jarvisStatusText');
 
-        // Controles de Mídia & Dançarina
         const folderSelect = document.getElementById('folderSelect');
         const customUrlInput = document.getElementById('customUrlInput');
         const loadUrlBtn = document.getElementById('loadUrlBtn');
@@ -457,10 +487,11 @@
         const trackInfo = document.getElementById('trackInfo');
         const nextBtn = document.getElementById('nextBtn');
         const prevBtn = document.getElementById('prevBtn');
-        const dancerAvatar = document.getElementById('dancerAvatar');
+        const dancerWrapper = document.getElementById('dancerWrapper');
         const dancerStatus = document.getElementById('dancerStatus');
+        const dancerImg = document.getElementById('dancerImg');
 
-        // Playlists de Exemplo
+        // Playlists
         const playlists = {
             cyber: [{title: "Synthwave Cyberpunk Mix", id: "4xDzrJKXOOY"}, {title: "Neon Horizon", id: "V9Pj2sbYJqw"}],
             epic: [{title: "Stark Orchestral Suite", id: "2S24-y0Ij3Y"}, {title: "Iron Protocol Theme", id: "7wtfhZwyrcc"}],
@@ -470,7 +501,7 @@
         let currentFolder = 'cyber';
         let currentIndex = 0;
 
-        // Memória Ilimitada no LocalStorage
+        // Histórico de Conversa (LocalStorage Ilimitado)
         function loadChatHistory() {
             const history = JSON.parse(localStorage.getItem('jarvis_chat_history') || '[]');
             if (history.length === 0) {
@@ -504,14 +535,14 @@
             }
         });
 
-        // Síntese de Voz Masculina Robótica em PT-BR
+        // Voz Robótica Masculina em PT-BR
         function speakRobotVoice(text) {
             if (!('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
             utterance.rate = 1.05;
-            utterance.pitch = 0.55; // Tom grave metálico
+            utterance.pitch = 0.55;
             
             const voices = window.speechSynthesis.getVoices();
             const ptVoice = voices.find(v => v.lang.includes('pt') && (v.name.includes('Daniel') || v.name.includes('Google') || v.name.includes('Male') || v.name.includes('Antônio')));
@@ -520,7 +551,6 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // Animações Humanizadas Reativas do J.A.R.V.I.S.
         function setJarvisReaction(state, textStatus) {
             jarvisStatusText.innerText = textStatus;
             arcReactor.style.animation = '';
@@ -543,14 +573,23 @@
             }
         }
 
-        // Carregar Mídia e Ativar Dança Rítmica da Personagem 2D
+        // Carregar Mídia e Sincronizar Dança da Personagem 2D
         function loadTrack(videoId, title) {
             playerScreen.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" allow="autoplay"></iframe>`;
             trackInfo.innerText = `Faixa: ${title}`;
             
-            // Ativa animação de dança na personagem 2D
-            dancerAvatar.style.animation = 'danceActive 0.6s infinite alternate ease-in-out';
-            dancerStatus.innerText = 'Dançando no Ritmo 🎶';
+            // Ajusta o estilo de dança conforme a pasta/estilo musical
+            dancerWrapper.className = 'dancer-image-wrapper';
+            if (currentFolder === 'cyber') {
+                dancerWrapper.classList.add('cyber-dance');
+                dancerStatus.innerText = 'Dançando: Cyberpunk Groove ⚡';
+            } else if (currentFolder === 'epic') {
+                dancerWrapper.classList.add('epic-dance');
+                dancerStatus.innerText = 'Dançando: Ritmo Épico Intenso 🔥';
+            } else {
+                dancerWrapper.classList.add('relax-dance');
+                dancerStatus.innerText = 'Dançando: Foco & Atmosfera Suave 🍃';
+            }
         }
 
         folderSelect.addEventListener('change', (e) => {
@@ -593,7 +632,7 @@
             }
         });
 
-        // Web Speech API para Comandos de Voz
+        // Reconhecimento de Voz (Microfone)
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
@@ -626,7 +665,7 @@
             micBtn.style.display = 'none';
         }
 
-        // Comunicação com o Servidor /api/jarvis
+        // Comunicação com o Backend
         async function sendCommand() {
             const text = promptInput.value.trim();
             if (!text) return;
